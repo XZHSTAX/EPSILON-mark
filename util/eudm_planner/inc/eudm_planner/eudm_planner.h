@@ -47,12 +47,12 @@ class EudmPlanner : public Planner {
     decimal_t lat_range;
 
     // * update on scenario-level
-    OnLaneForwardSimulation::Param sim_param;
+    OnLaneForwardSimulation::Param sim_param; // 自车前向模拟所需的参数，包括idm模型参数
 
-    LatSimMode seq_lat_mode;
-    common::LateralBehavior lat_behavior_longterm{LateralBehavior::kUndefined};
-    common::LateralBehavior seq_lat_behavior;
-    bool is_cancel_behavior;
+    LatSimMode seq_lat_mode;        // 横向动作模式，被分为4种，一直保持，保持后变道，一直变道，变道后取消
+    common::LateralBehavior lat_behavior_longterm{LateralBehavior::kUndefined}; // 长期目标动作
+    common::LateralBehavior seq_lat_behavior; // 自车的横向动作，由动作序列确定。如果动作以变道结束，则为变道；否则为保持
+    bool is_cancel_behavior;                  // 横向动作是否被取消，如果被取消，则为true(被取消，即为横向动作后有车道保持动作)
     decimal_t operation_at_seconds{0.0};
 
     // * update on layer-level
@@ -347,7 +347,7 @@ class EudmPlanner : public Planner {
   LaneChangeInfo lc_info_;
   decimal_t desired_velocity_{5.0};
   decimal_t sim_time_total_ = 0.0;
-  std::set<int> pre_deleted_seq_ids_;
+  std::set<int> pre_deleted_seq_ids_;      // 预删除动作序列的id的集合；记录不合理的动作序列的id，比如先向左变道又向右变道
   int ego_lane_id_{kInvalidLaneId};
   std::vector<int> potential_lcl_lane_ids_;
   std::vector<int> potential_lcr_lane_ids_;
@@ -358,26 +358,26 @@ class EudmPlanner : public Planner {
   common::RssChecker::RssConfig rss_config_strict_as_front_;
   common::RssChecker::RssConfig rss_config_strict_as_rear_;
 
-  OnLaneForwardSimulation::Param ego_sim_param_;
+  OnLaneForwardSimulation::Param ego_sim_param_;    // 自车模拟所用的参数
   OnLaneForwardSimulation::Param agent_sim_param_;
 
   decimal_t time_stamp_;
   int ego_id_;
   common::Vehicle ego_vehicle_;
 
-  // * result
+  // * result 储存前向模拟相关结果
   int winner_id_ = 0;
   decimal_t winner_score_ = 0.0;
   std::vector<DcpAction> winner_action_seq_;
-  std::vector<int> sim_res_;
-  std::vector<int> risky_res_;
+  std::vector<int> sim_res_; // 记录前向模拟结果，0代表成功，1代表失败；为向量，表示每个动作序列的模拟结果
+  std::vector<int> risky_res_; // 记录风险评估结果，0表示危险，1表示安全;实际上由CostFunction给出；感觉只是记录了，但是没有采取相应的措施？
   std::vector<std::string> sim_info_;
   std::vector<decimal_t> final_cost_;
-  std::vector<std::vector<CostStructure>> progress_cost_;
-  std::vector<CostStructure> tail_cost_;
-  vec_E<vec_E<common::Vehicle>> forward_trajs_;
-  std::vector<std::vector<LateralBehavior>> forward_lat_behaviors_;
-  std::vector<std::vector<LongitudinalBehavior>> forward_lon_behaviors_;
+  std::vector<std::vector<CostStructure>> progress_cost_; // 表示动作序列的cost；每个动作序列对应一个CostStructure结构体类型的向量，向量中每个元素表示动作序列中每个动作的cost
+  std::vector<CostStructure> tail_cost_;                  // 尾部cost，但是该值没有计算
+  vec_E<vec_E<common::Vehicle>> forward_trajs_;           // 自车前向模拟轨迹，每个轨迹点是common::Vehicle，除了车辆信息，还记录了位置、速度等信息
+  std::vector<std::vector<LateralBehavior>> forward_lat_behaviors_;      // 主车的横向动作序列
+  std::vector<std::vector<LongitudinalBehavior>> forward_lon_behaviors_; // 主车的纵向动作序列，每个动作序列里的纵向决策是一样的
   vec_E<std::unordered_map<int, vec_E<common::Vehicle>>> surround_trajs_;
   decimal_t time_cost_ = 0.0;
 };

@@ -23,7 +23,7 @@ class OnLaneForwardSimulation {
   using VehicleControlSignal = common::VehicleControlSignal;
   using Vehicle = common::Vehicle;
   using CtxParam = simulator::ContextIntelligentDriverModel::CtxParam;
-
+  // 自车前向模拟所需的参数，包括idm模型参数
   struct Param {
     simulator::IntelligentDriverModel::Param idm_param;
     decimal_t steer_control_gain = 1.5;

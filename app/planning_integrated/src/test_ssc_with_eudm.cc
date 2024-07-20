@@ -26,12 +26,18 @@ double bp_work_rate = 20.0;
 planning::SscPlannerServer* p_ssc_server_{nullptr};
 planning::EudmPlannerServer* p_bp_server_{nullptr};
 
+/**
+ * 当Behavior planner运行一次后，会更新smm，并且调用这个回调函数，把smm传给ssc
+*/
 int BehaviorUpdateCallback(
     const semantic_map_manager::SemanticMapManager& smm) {
   if (p_ssc_server_) p_ssc_server_->PushSemanticMap(smm);
   return 0;
 }
 
+/**
+ * 当Semantic map manager接收到phy传来的动态信息时，会更新vehicle_set_，并且调用这个回调函数，把smm传给behavior planner
+*/
 int SemanticMapUpdateCallback(
     const semantic_map_manager::SemanticMapManager& smm) {
   if (p_bp_server_) p_bp_server_->PushSemanticMap(smm);
@@ -67,8 +73,7 @@ int main(int argc, char** argv) {
     assert(false);
   }
 
-  semantic_map_manager::SemanticMapManager semantic_map_manager(
-      ego_id, agent_config_path);
+  semantic_map_manager::SemanticMapManager semantic_map_manager(ego_id, agent_config_path);
   semantic_map_manager::RosAdapter smm_ros_adapter(nh, &semantic_map_manager);
   smm_ros_adapter.BindMapUpdateCallback(SemanticMapUpdateCallback);
 

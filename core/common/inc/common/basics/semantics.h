@@ -602,7 +602,7 @@ class GridMapND {
   int data_size_{0};
   std::vector<T> data_;
 };
-
+// ATTENTION 地图的车道信息，以该种形式储存
 struct LaneRaw {
   int id;
   int dir;
@@ -627,7 +627,7 @@ struct LaneRaw {
    */
   void print() const;
 };
-
+// ATTENTION 所有车道以该种方式储存
 struct LaneNet {
   std::unordered_map<int, LaneRaw> lane_set;
 

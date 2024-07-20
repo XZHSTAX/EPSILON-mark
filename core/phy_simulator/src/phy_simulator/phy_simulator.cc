@@ -17,7 +17,7 @@ PhySimulation::PhySimulation(const std::string &vehicle_set_path,
   p_arena_loader_->set_map_path(map_path);
   p_arena_loader_->set_lane_net_path(lane_net_path);
 
-  GetDataFromArenaLoader();
+  GetDataFromArenaLoader();         // 解析路径的文件，并存入对应的成员变量
   SetupVehicleModelForVehicleSet();
 }
 
@@ -68,7 +68,7 @@ bool PhySimulation::UpdateSimulatorUsingSignalSet(
   UpdateVehicleStates(signal_set, dt);
   return true;
 }
-
+// 根据signal_set和dt向车辆施加控制信号，并更新车辆状态，更新vehicle_set_
 bool PhySimulation::UpdateVehicleStates(
     const common::VehicleControlSignalSet &signal_set, const decimal_t &dt) {
   if (signal_set.signal_set.size() != vehicle_set_.vehicles.size()) {

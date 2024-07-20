@@ -11,7 +11,9 @@ from pprint import pprint
 # data_folder = '/home/denny/Dropbox/Dropbox/00-Research/IROS2019_wc_zl/qgis_playground/benchmark_track/geojson/'
 # data_folder = '/home/zl/catkin_ws/src/vehicle_planning/qgis_projects/urban_google_prj/geojson/'
 # data_folder = '/home/zl/catkin_ws/src/vehicle_planning/qgis_projects/highway/geojson/'
-data_folder = '../../../toolchain/qgis_projects/highway/geojson/'
+# data_folder = '../../../toolchain/qgis_projects/highway/geojson/'
+
+data_folder = '/home/xzh/ros1/BPws/src/EPSILON/toolchain/qgis_projects/highway/geojson/'
 
 print(data_folder)
 

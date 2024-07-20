@@ -4,10 +4,12 @@
 
   <arg name="ctrl_topic" value="/ctrl/agent_0" />
 
+  <!-- TODO:XZH 这里可以换地图 -->
   <arg name="playground" value = "highway_v1.0" />
   <!-- <arg name="playground" value = "ring_tiny_v1.0" /> -->
   <!-- <arg name="playground" value = "ring_small_v1.0" /> -->
 
+  <!-- type：节点名称，name：给节点命名 -->
   <node pkg="planning_integrated"
         type="test_ssc_with_eudm"
         name="test_ssc_with_eudm_0"

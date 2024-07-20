@@ -47,6 +47,7 @@ void RosAdapter::ArenaInfoDynamicCallback(
   if (get_arena_info_static_) {
     p_data_renderer_->Render(time_stamp.toSec(), lane_net_, vehicle_set_,
                              obstacle_set_);
+    // 调用回调函数
     if (has_callback_binded_) {
       private_callback_fn_(*p_smm_);
     }

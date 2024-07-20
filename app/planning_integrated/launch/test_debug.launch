@@ -1,0 +1,8 @@
+<launch>
+    <include file="$(find planning_integrated)/launch/test_ssc_with_eudm_ros.launch" />
+    <!-- <include file="$(find ai_agent_planner)/launch/onlane_ai_agent.launch" /> -->
+    <!-- <include file="$(find phy_simulator)/launch/phy_simulator_planning.launch" /> -->
+    
+    <node pkg="rviz" type="rviz" name="rviz"
+    args="-d $(find phy_simulator)/rviz/phy_simulator_planning.rviz"/>
+</launch>

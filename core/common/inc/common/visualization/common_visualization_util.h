@@ -743,6 +743,7 @@ class VisualizationUtil {
     GetRosPoseFrom3DofState(Vec3f(obb.x, obb.y, obb.angle), &obb_pose);
     // obb_pose.position.z = -0.4;
     p_marker->pose = obb_pose;
+    // 又进行了一次坐标转换
     tf::Quaternion q(0.0, -0.7071, -0.7071, 0.0);
     quaternionTFToMsg(
         tf::Quaternion(obb_pose.orientation.x, obb_pose.orientation.y,
@@ -1046,7 +1047,9 @@ class VisualizationUtil {
     obb_marker.header.stamp = ros_time;
     obb_marker.id = id;
     // obb_marker.ns = std::string("obb");
+    // 生成一个boundingBox
     OrientedBoundingBox2D obb = vehicle.RetOrientedBoundingBox();
+    // boundingBox的参数转换RosMarker
     GetRosMarkerCubeUsingOrientedBoundingBox2D(obb, color_obb, 1.7,
                                                &obb_marker);
     obb_marker.pose.position.z = 0.75;
@@ -1271,6 +1274,7 @@ class VisualizationUtil {
           angle = kPi / 4.0;
         }
 
+        // 在behavior.ref_lane上采样点，并存入direction_mk.points
         const decimal_t sample_step = 5.0;
         const decimal_t arrow_width = 0.75;
         for (decimal_t s = behavior.ref_lane.begin();
@@ -1279,7 +1283,6 @@ class VisualizationUtil {
           behavior.ref_lane.GetPositionByArcLength(s, &pos);
           Vecf<2> normal_vec;
           behavior.ref_lane.GetNormalVectorByArcLength(s, &normal_vec);
-
           geometry_msgs::Point origin;
           ConvertVectorToPoint<2>(pos, &origin);
           {
@@ -1304,6 +1307,7 @@ class VisualizationUtil {
     }
 
     // visualize curvature
+    // 可视化曲率，不同曲率对应不同颜色
     {
       decimal_t sample_step = 1.0;
       if (behavior.ref_lane.IsValid()) {
@@ -1337,6 +1341,7 @@ class VisualizationUtil {
       }
     }
 
+    // 可视化横向动作为一个箭头，根据不同的行为对应不同的颜色，箭头的位置在behavior.state.vec_position(0)和(1)之间
     // visualize longitudinal behavior
     {
       if (behavior.ref_lane.IsValid()) {
@@ -1379,7 +1384,7 @@ class VisualizationUtil {
         lon_mk.points.push_back(pt1);
         lon_mk.scale.x = 0.2;
         lon_mk.scale.y = 0.4;
-        FillColorInMarker(clr, &lon_mk);
+        FillColorInMarker(clr, &lon_mk); // 把颜色赋给lon_mk
         p_marker_array->markers.push_back(lon_mk);
       }
     }

@@ -18,7 +18,7 @@ EudmPlannerServer::EudmPlannerServer(ros::NodeHandle nh, int ego_id)
   p_visualizer_ = new EudmPlannerVisualizer(nh, &bp_manager_, ego_id);
   p_input_smm_buff_ = new moodycamel::ReaderWriterQueue<SemanticMapManager>(
       config_.kInputBufferSize);
-  task_.user_perferred_behavior = 0;
+  task_.user_perferred_behavior = 0; // 初始化用户期望行为，为无行为
 }
 
 EudmPlannerServer::EudmPlannerServer(ros::NodeHandle nh, double work_rate,
@@ -63,21 +63,21 @@ void EudmPlannerServer::JoyCallback(const sensor_msgs::Joy::ConstPtr &msg) {
       msg->buttons[6] == 0)
     return;
 
-  if (msg->buttons[2] == 1) {
+  if (msg->buttons[2] == 1) {           // lcl
     if (task_.user_perferred_behavior != -1) {
       task_.user_perferred_behavior = -1;
     } else {
       task_.user_perferred_behavior = 0;
     }
-  } else if (msg->buttons[1] == 1) {
+  } else if (msg->buttons[1] == 1) {   // lcr
     if (task_.user_perferred_behavior != 1) {
       task_.user_perferred_behavior = 1;
     } else {
       task_.user_perferred_behavior = 0;
     }
-  } else if (msg->buttons[3] == 1) {
+  } else if (msg->buttons[3] == 1) {  // +1m/s
     task_.user_desired_vel = task_.user_desired_vel + 1.0;
-  } else if (msg->buttons[0] == 1) {
+  } else if (msg->buttons[0] == 1) {  // -1m/s
     task_.user_desired_vel = std::max(task_.user_desired_vel - 1.0, 0.0);
   } else if (msg->buttons[4] == 1) {
     task_.lc_info.forbid_lane_change_left = !task_.lc_info.forbid_lane_change_left;
@@ -89,6 +89,7 @@ void EudmPlannerServer::JoyCallback(const sensor_msgs::Joy::ConstPtr &msg) {
 }
 
 void EudmPlannerServer::Start() {
+  // detach()函数用于将新创建的线程与当前线程分离，使其能够独立运行。
   std::thread(&EudmPlannerServer::MainThread, this).detach();
   task_.is_under_ctrl = true;
 }
@@ -107,23 +108,25 @@ void EudmPlannerServer::MainThread() {
 }
 
 void EudmPlannerServer::PlanCycleCallback() {
-  if (p_input_smm_buff_ == nullptr) return;
+  if (p_input_smm_buff_ == nullptr) return; // 判断p_input_smm_buff_是否为空指针
 
+  // 从p_input_smm_buff_中不断读取数据，存入smm_中，直到p_input_smm_buff_中没有数据为止
   bool has_updated_map = false;
   while (p_input_smm_buff_->try_dequeue(smm_)) {
     has_updated_map = true;
   }
-
+  // 如果p_input_smm_buff_中没有新数据，则返回
   if (!has_updated_map) return;
-
+  // 此行代码的效果是创建一个std::shared_ptr智能指针map_ptr，指向一个新分配的SemanticMapManager对象，该对象是通过拷贝smm_而创建的。
   auto map_ptr =
       std::make_shared<semantic_map_manager::SemanticMapManager>(smm_);
-
-  decimal_t replan_duration = 1.0 / work_rate_;
+  
+  decimal_t replan_duration = 1.0 / work_rate_; // 一次规划时长
   double stamp =
       std::floor(smm_.time_stamp() / replan_duration) * replan_duration;
 
   if (bp_manager_.Run(stamp, map_ptr, task_) == kSuccess) {
+    // 如果行为规划成功，则把规划的动作使用set_ego_behavior，设置到smm中
     common::SemanticBehavior behavior;
     bp_manager_.ConstructBehavior(&behavior);
     smm_.set_ego_behavior(behavior);

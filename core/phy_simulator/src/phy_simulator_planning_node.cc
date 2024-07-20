@@ -120,13 +120,13 @@ int main(int argc, char** argv) {
     ros::spinOnce();
 
     phy_sim.UpdateSimulatorUsingSignalSet(_signal_set, 1.0 / simulation_rate);
-
+    // 动态信号，100Hz
     ros::Time tnow = ros::Time::now();
     if (tnow >= next_gt_pub_time) {
       next_gt_pub_time += ros::Duration(1.0 / gt_msg_rate);
       ros_adapter.PublishDynamicDataWithStamp(tnow);
     }
-
+    // 静态信号，除了timestmp，都是固定的；10Hz
     if (tnow >= next_gt_static_pub_time) {
       next_gt_static_pub_time += ros::Duration(1.0 / gt_static_msg_rate);
       ros_adapter.PublishStaticDataWithStamp(tnow);

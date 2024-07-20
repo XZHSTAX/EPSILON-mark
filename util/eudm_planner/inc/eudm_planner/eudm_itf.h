@@ -20,10 +20,10 @@ struct LaneChangeInfo {
 };
 
 struct Task {
-  bool is_under_ctrl = false;
-  double user_desired_vel;
-  int user_perferred_behavior = 0;
-  LaneChangeInfo lc_info;
+  bool is_under_ctrl = false;     // 是否处于自动驾驶控制下
+  double user_desired_vel;        // 用户期望速度
+  int user_perferred_behavior = 0; // 用户期望行为 -1 向左变道，0 直行， 1 向右变道 
+  LaneChangeInfo lc_info;         // 变道信息
 };
 
 }  // namespace eudm

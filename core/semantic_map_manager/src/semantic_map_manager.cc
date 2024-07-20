@@ -755,7 +755,14 @@ ErrorType SemanticMapManager::IsTopologicallyReachable(
   }
   return kSuccess;
 }
-
+/**
+ * @brief 获取给定状态下的最近车道ID，距离和弧长
+ * @param state 状态
+ * @param navi_path 导航路径
+ * @param id 最近车道ID
+ * @param distance 距离
+ * @param arc_len 弧长
+*/
 ErrorType SemanticMapManager::GetNearestLaneIdUsingState(
     const Vec3f &state, const std::vector<int> &navi_path, int *id,
     decimal_t *distance, decimal_t *arc_len) const {
@@ -895,6 +902,7 @@ ErrorType SemanticMapManager::UpdateKeyVehicles() {
     // id - reference arc_len of start points w.r.t to ego vehicle
     key_lane_ids.insert(std::pair<int, decimal_t>(cur_lane_id, -cur_arc_len));
     mid_lane_ids.push_back(cur_lane_id);
+    // 如果可以向左变道，则加入左边车道的车。
     if (whole_lane_net_.lane_set.at(cur_lane_id).l_change_avbl) {
       key_lane_ids.insert(std::pair<int, decimal_t>(
           whole_lane_net_.lane_set.at(cur_lane_id).l_lane_id, -cur_arc_len));
@@ -1200,6 +1208,7 @@ ErrorType SemanticMapManager::GetRefLaneForStateByBehavior(
   int current_lane_id;
   decimal_t distance_to_lane;
   decimal_t arc_len;
+  // 获取最近车道的Id、到车道的距离和弧长。
   if (GetNearestLaneIdUsingState(state_3dof, navi_path, &current_lane_id,
                                  &distance_to_lane, &arc_len) != kSuccess) {
     printf("[GetRefLaneForStateByBehavior]Cannot get nearest lane.\n");
@@ -1209,7 +1218,7 @@ ErrorType SemanticMapManager::GetRefLaneForStateByBehavior(
   if (distance_to_lane > max_distance_to_lane_) {
     return kWrongStatus;
   }
-
+  // 根据当前车道和行为获取目标车道Id：
   int target_lane_id;
   if (GetTargetLaneId(current_lane_id, behavior, &target_lane_id) != kSuccess) {
     // printf(
@@ -1218,7 +1227,7 @@ ErrorType SemanticMapManager::GetRefLaneForStateByBehavior(
     //     current_lane_id, static_cast<int>(behavior));
     return kWrongStatus;
   }
-
+  // 如果启用了快速车道查找并且存在快速查找表，则选择其中的一个局部车道作为结果，存入lane中。
   if (agent_config_info_.enable_fast_lane_lut && has_fast_lut_) {
     if (segment_to_local_lut_.end() !=
         segment_to_local_lut_.find(target_lane_id)) {
@@ -1294,7 +1303,13 @@ ErrorType SemanticMapManager::SampleLane(const common::Lane &lane,
   }
   return kSuccess;
 }
-
+/**
+ * @brief Get the target lane id according to the current lane id and the lateral behavior
+ * 如果当前行为是保持车道，则返回当前车道id，如果变道，且可以变道，则返回变道后的车道id
+ * @param lane_id current lane id
+ * @param behavior lateral behavior
+ * @param target_lane_id target lane id
+*/
 ErrorType SemanticMapManager::GetTargetLaneId(const int lane_id,
                                               const LateralBehavior &behavior,
                                               int *target_lane_id) const {

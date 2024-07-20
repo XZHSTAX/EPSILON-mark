@@ -380,7 +380,7 @@ void EudmManager::UpdateLaneChangeContextByTask(
   if (task.is_under_ctrl) {
     if (!lc_context_.completed) {
       if (!map_adapter_.IsLaneConsistent(lc_context_.ego_lane_id,
-                                         ego_lane_id_)) {
+                                         ego_lane_id_)) { // 前后帧的ego lane id 发生变化，认为换道完成
         // in progress lane change and lane id change
         LOG(WARNING) << "[HMI]lane change completed due to different lane id "
                      << lc_context_.ego_lane_id << " to " << ego_lane_id_
@@ -388,9 +388,9 @@ void EudmManager::UpdateLaneChangeContextByTask(
         lc_context_.completed = true;
         lc_context_.trigger_when_appropriate = false;
         last_lc_proposal_.trigger_time = stamp;
-      } else {
+      } else { // 前后帧的ego lane id 没有发生变化，认为换道进行中 
         if (task.user_perferred_behavior != 1 &&
-            last_task_.user_perferred_behavior == 1) {
+            last_task_.user_perferred_behavior == 1) { // 换道中，向左的换道指令取消
           // receive a lane cancel trigger
           LOG(WARNING) << "[HMI]lane change cancel by stick "
                        << last_task_.user_perferred_behavior << " to "
@@ -399,7 +399,7 @@ void EudmManager::UpdateLaneChangeContextByTask(
           lc_context_.trigger_when_appropriate = false;
           last_lc_proposal_.trigger_time = stamp;
         } else if (task.user_perferred_behavior != -1 &&
-                   last_task_.user_perferred_behavior == -1) {
+                   last_task_.user_perferred_behavior == -1) { // 换道中，向右的换道指令取消
           // receive a lane cancel trigger
           LOG(WARNING) << "[HMI]lane change cancel by stick "
                        << last_task_.user_perferred_behavior << " to "
@@ -482,34 +482,34 @@ void EudmManager::UpdateLaneChangeContextByTask(
           }
         }
       }
-    } else {
+    } else { // 换道完成，接受新的变道指令，首先响应用户指令
       // lane change completed state: welcome new activations
       // handle user requirement first
       if (task.user_perferred_behavior != 1 &&
           last_task_.user_perferred_behavior == 1 &&
-          lc_context_.trigger_when_appropriate) {
+          lc_context_.trigger_when_appropriate) { // 用户前后帧指令不一致，取消变道，进入ALC
         LOG(WARNING) << "[HMI]clear cached stick trigger state. Cd alc.";
         lc_context_.trigger_when_appropriate = false;
         last_lc_proposal_.trigger_time = stamp;
       } else if (task.user_perferred_behavior != -1 &&
                  last_task_.user_perferred_behavior == -1 &&
-                 lc_context_.trigger_when_appropriate) {
+                 lc_context_.trigger_when_appropriate) { // 用户前后帧指令不一致，取消变道，进入ALC
         LOG(WARNING) << "[HMI]clear cached stick trigger state. Cd alc.";
         lc_context_.trigger_when_appropriate = false;
         last_lc_proposal_.trigger_time = stamp;
       }
 
       if (task.user_perferred_behavior == 1 &&
-          last_task_.user_perferred_behavior != 1) {
+          last_task_.user_perferred_behavior != 1) { // 换道已经完成，此时收到新的向右换道指令
         // receive a lane change right trigger and previous action has been
         // completed
-        if (task.lc_info.forbid_lane_change_right) {
+        if (task.lc_info.forbid_lane_change_right) { // 右边不能变道
           LOG(WARNING)
               << "[HMI]cannot stick [Right]. Will trigger when appropriate.";
           lc_context_.trigger_when_appropriate = true;
           lc_context_.lat = LateralBehavior::kLaneChangeRight;
         } else {
-          if (IsTriggerAppropriate(LateralBehavior::kLaneChangeRight)) {
+          if (IsTriggerAppropriate(LateralBehavior::kLaneChangeRight)) { // 换道已经完成，此时收到新的向右换道指令，并且上一帧规划中向右变道是可行的
             lc_context_.completed = false;
             lc_context_.trigger_when_appropriate = false;
             lc_context_.trigger_time = stamp;
@@ -547,7 +547,7 @@ void EudmManager::UpdateLaneChangeContextByTask(
           lc_context_.trigger_when_appropriate = true;
           lc_context_.lat = LateralBehavior::kLaneChangeLeft;
         } else {
-          if (IsTriggerAppropriate(LateralBehavior::kLaneChangeLeft)) {
+          if (IsTriggerAppropriate(LateralBehavior::kLaneChangeLeft)) { // 和上面向右变道相似，只是变成向左边变道
             lc_context_.completed = false;
             lc_context_.trigger_when_appropriate = false;
             lc_context_.trigger_time = stamp;
@@ -663,6 +663,10 @@ void EudmManager::UpdateLaneChangeContextByTask(
   last_task_ = task;
 }  // namespace planning
 
+/**
+ * @brief Save the snapshot of the current planning result.
+ * 把规划的结果保存到一个结构体中
+*/
 void EudmManager::SaveSnapshot(Snapshot* snapshot) {
   snapshot->valid = true;
   snapshot->plan_state = bp_.plan_state();
@@ -691,13 +695,13 @@ void EudmManager::ConstructBehavior(common::SemanticBehavior* behavior) {
   surround_trajs_final.emplace_back(
       last_snapshot_.surround_trajs[selected_seq_id]);
   behavior->lat_behavior =
-      last_snapshot_.forward_lat_behaviors[selected_seq_id].front();
+                          last_snapshot_.forward_lat_behaviors[selected_seq_id].front();
   behavior->lon_behavior =
-      last_snapshot_.forward_lon_behaviors[selected_seq_id].front();
+                          last_snapshot_.forward_lon_behaviors[selected_seq_id].front();
   behavior->forward_trajs = vec_E<vec_E<common::Vehicle>>{
-      last_snapshot_.forward_trajs[selected_seq_id]};
+                                                        last_snapshot_.forward_trajs[selected_seq_id]};
   behavior->forward_behaviors = std::vector<LateralBehavior>{
-      last_snapshot_.forward_lat_behaviors[selected_seq_id].front()};
+                                                        last_snapshot_.forward_lat_behaviors[selected_seq_id].front()};
   behavior->surround_trajs = surround_trajs_final;
   behavior->state = last_snapshot_.plan_state;
   behavior->ref_lane = last_snapshot_.ref_lane;
@@ -790,7 +794,8 @@ ErrorType EudmManager::Run(
                << "******************";
   static TicToc eudm_timer;
   eudm_timer.tic();
-
+  // #region EdumPlanner 运行流程
+  // #tag 准备工作
   // * I : Prepare
   static TicToc prepare_timer;
   prepare_timer.tic();
@@ -800,9 +805,9 @@ ErrorType EudmManager::Run(
   auto t_prepare = prepare_timer.toc();
   LOG(WARNING) << std::fixed << std::setprecision(4)
                << "[Eudm]Prepare time cost " << t_prepare << " ms";
-
+  // #tag 运行一次
   // * II : RunOnce
-  static TicToc runonce_timer;
+  static TicToc runonce_timer; // 记录RunOnce一次运行的时间
   runonce_timer.tic();
   if (bp_.RunOnce() != kSuccess) {
     LOG(WARNING) << "[Eudm][Fatal]BP runonce failed.";
@@ -814,9 +819,14 @@ ErrorType EudmManager::Run(
 
   static TicToc sum_reselect_timer;
   sum_reselect_timer.tic();
+  // #tag 总结
   // * III: Summarize
+  // 把 bp_的输出结果汇总到snapshot中
+  // ConstructBehavior利用snapshot中的信息，构建结构体behavior，这个behavior会被传到smm中
   Snapshot snapshot;
   SaveSnapshot(&snapshot);
+
+  // #tag 重新选择
   // * IV: Reselect
   if (ReselectByContext(stamp, snapshot, &snapshot.processed_winner_id) !=
       kSuccess) {
@@ -860,6 +870,7 @@ ErrorType EudmManager::Run(
 
   last_snapshot_ = snapshot;
   GenerateLaneChangeProposal(stamp, task);
+  // #tag 更新
   // * V: Update
   context_.is_valid = true;
   context_.seq_start_time = stamp;
@@ -876,6 +887,7 @@ ErrorType EudmManager::Run(
                << "[Eudm]******************** RUN FINISH: " << stamp << " +"
                << t_eudmrun << " ms ******************";
   return kSuccess;
+  // #endregion EdumPlanner
 }
 
 bool EudmManager::GetReplanDesiredAction(const decimal_t current_time,

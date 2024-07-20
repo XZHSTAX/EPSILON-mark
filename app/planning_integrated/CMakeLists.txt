@@ -35,10 +35,12 @@ include_directories(
     ${eudm_planner_INCLUDE_DIRS}
     ${ssc_planner_INCLUDE_DIRS}
 )
-
+# 添加一个测试程序，用于测试ssc_server_ros和mpdm_planner_ros的集成
+# 使用src/test_ssc_with_mpdm.cc 来构建一个名为test_ssc_with_mpdm的可执行文件
 add_executable(test_ssc_with_mpdm
     src/test_ssc_with_mpdm.cc
 )
+# 在构建test_ssc_with_mpdm时，需要链接ssc_server_ros和mpdm_planner_ros库
 target_link_libraries(test_ssc_with_mpdm
    ${catkin_LIBRARIES}
    ssc_server_ros

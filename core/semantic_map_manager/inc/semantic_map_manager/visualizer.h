@@ -14,7 +14,7 @@
 #include "common/state/state.h"
 #include "common/visualization/common_visualization_util.h"
 #include "semantic_map_manager/semantic_map_manager.h"
-
+#include <std_msgs/String.h>
 namespace semantic_map_manager {
 
 class Visualizer {
@@ -39,6 +39,8 @@ class Visualizer {
                                    const common::LaneNet &lane_net,
                                    const std::vector<int> &deleted_lane_ids);
   void VisualizeBehavior(const ros::Time &stamp,
+                         const common::SemanticBehavior &behavior);
+  void RecordVisualizeBehavior(const ros::Time &stamp,
                          const common::SemanticBehavior &behavior);
   void VisualizeSurroundingVehicles(const ros::Time &stamp,
                                     const common::VehicleSet &vehicle_set,
@@ -76,6 +78,7 @@ class Visualizer {
   ros::Publisher surrounding_lane_net_pub_;
   ros::Publisher local_lanes_pub_;
   ros::Publisher behavior_vis_pub_;
+  ros::Publisher record_behavior_vis_pub_;
   ros::Publisher pred_traj_openloop_vis_pub_;
   ros::Publisher pred_intention_vis_pub_;
   ros::Publisher surrounding_vehicle_vis_pub_;

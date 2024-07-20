@@ -35,16 +35,24 @@ class EudmPlannerVisualizer {
 
     forward_traj_vis_pub_ =
         nh_.advertise<visualization_msgs::MarkerArray>(forward_traj_topic, 1);
+    
+    std::string record_forward_traj_topic = std::string("/record/agent_") +
+                                     std::to_string(ego_id_) +
+                                     std::string("/forward_trajs");
+
+    record_forward_traj_vis_pub_ =
+        nh_.advertise<visualization_msgs::MarkerArray>(record_forward_traj_topic, 1);
   }
 
   void PublishDataWithStamp(const ros::Time& stamp) {
     VisualizeForwardTrajectories(stamp);
+    RecordVisualizeForwardTrajectories(stamp);
   }
 
   void VisualizeForwardTrajectories(const ros::Time& stamp) {
     auto forward_trajs = p_bp_manager_->planner().forward_trajs();
     int processed_winner_id = p_bp_manager_->processed_winner_id();
-    int original_winner_id = p_bp_manager_->original_winner_id();
+    int original_winner_id = p_bp_manager_->original_winner_id(); // TODO: original_winner_id是什么？
     visualization_msgs::MarkerArray traj_list_marker;
     common::ColorARGB traj_color(0.5, 0.5, 0.5, 0.5);
     double traj_z = 0.3;
@@ -60,6 +68,7 @@ class EudmPlannerVisualizer {
         traj_z = 0.3;
       }
       std::vector<common::Point> points;
+      // 遍历轨迹上的每个点，把点变为圆柱体标记
       for (const auto& v : forward_trajs[i]) {
         common::Point pt(v.state().vec_position(0), v.state().vec_position(1));
         // pt.z = v.state().time_stamp -
@@ -68,6 +77,7 @@ class EudmPlannerVisualizer {
         points.push_back(pt);
         visualization_msgs::Marker point_marker;
         // point_marker.ns = "point";
+        // 把点变为圆柱体标记
         common::VisualizationUtil::GetRosMarkerCylinderUsingPoint(
             common::Point(pt), Vec3f(0.5, 0.5, 0.1), traj_color, 0,
             &point_marker);
@@ -75,16 +85,52 @@ class EudmPlannerVisualizer {
       }
       visualization_msgs::Marker line_marker;
       // line_marker.ns = "line";
+      // 把点连成线
       common::VisualizationUtil::GetRosMarkerLineStripUsingPoints(
           points, Vec3f(0.1, 0.1, 0.1), traj_color, 0, &line_marker);
       traj_list_marker.markers.push_back(line_marker);
     }
     int num_markers = static_cast<int>(traj_list_marker.markers.size());
+    // 为本次数据添加头信息，并且发送删除上次数据的指令
     common::VisualizationUtil::FillHeaderIdInMarkerArray(
         stamp, std::string("map"), last_forward_trajs_marker_cnt_,
         &traj_list_marker);
     last_forward_trajs_marker_cnt_ = num_markers;
     forward_traj_vis_pub_.publish(traj_list_marker);
+  }
+
+  void RecordVisualizeForwardTrajectories(const ros::Time& stamp) {
+    auto forward_trajs = p_bp_manager_->planner().forward_trajs();
+    int processed_winner_id = p_bp_manager_->processed_winner_id();
+    int original_winner_id = p_bp_manager_->original_winner_id(); // TODO: original_winner_id是什么？
+    visualization_msgs::MarkerArray traj_list_marker;
+    common::ColorARGB traj_color(0.5, 0.5, 0.5, 0.5);
+    double traj_z = 0.3;
+    for (int i = 0; i < static_cast<int>(forward_trajs.size()); ++i) {
+      if (i == processed_winner_id) {
+        traj_color = common::cmap.at("gold");
+        traj_z = 0.4;
+      } else if (i == original_winner_id) {
+        traj_color = common::cmap.at("spring green");
+        traj_z = 0.4;
+      } else {
+        traj_color = common::ColorARGB(0.5, 0.5, 0.5, 0.5);
+        traj_z = 0.3;
+      }
+      std::vector<common::Point> points;
+      // 遍历轨迹上的每个点，把点变为圆柱体标记
+      for (const auto& v : forward_trajs[i]) {
+        common::Point pt(v.state().vec_position(0), v.state().vec_position(1));
+        pt.z = traj_z;
+        points.push_back(pt);
+      }
+      visualization_msgs::Marker line_marker;
+      // 把点连成线
+      common::VisualizationUtil::GetRosMarkerLineStripUsingPoints(
+          points, Vec3f(0.1, 0.1, 0.1), traj_color, 0, &line_marker);
+      traj_list_marker.markers.push_back(line_marker);
+    }
+    record_forward_traj_vis_pub_.publish(traj_list_marker);
   }
 
   void set_use_sim_state(bool use_sim_state) { use_sim_state_ = use_sim_state; }
@@ -97,6 +143,7 @@ class EudmPlannerVisualizer {
   int last_forward_trajs_marker_cnt_ = 0;
 
   ros::Publisher forward_traj_vis_pub_;
+  ros::Publisher record_forward_traj_vis_pub_;
 
   EudmManager* p_bp_manager_{nullptr};
 };

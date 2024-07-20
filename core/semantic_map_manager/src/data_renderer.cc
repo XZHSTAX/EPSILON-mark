@@ -27,18 +27,21 @@ DataRenderer::DataRenderer(SemanticMapManager *smm_ptr)
   printf("[DataRenderer] Initialization finished\n");
 }
 
+// 数据处理，并且更新到 SemanticMapManager中
 ErrorType DataRenderer::Render(const double &time_stamp,
                                const common::LaneNet &lane_net,
                                const common::VehicleSet &vehicle_set,
                                const common::ObstacleSet &obstacle_set) {
   time_stamp_ = time_stamp;
+  // 先根据phy传来的数据更新data_renderer中的成员变量，然后再把这些成员变量更新到SemanticMapManager中
   GetEgoVehicle(vehicle_set);  // ~ Must update ego vehicle first
   GetObstacleMap(obstacle_set);
   GetWholeLaneNet(lane_net);
-  GetSurroundingLaneNet(lane_net);
-  GetSurroundingVehicles(vehicle_set);
-
+  GetSurroundingLaneNet(lane_net); // 通过 kdTree，搜索主车一定范围内的车道
+  GetSurroundingVehicles(vehicle_set); // 搜索主车 150m 半径范围内的车辆，作为 Sounding Vehicles
+  // 默认配置是没有扰动
   if (p_semantic_map_manager_->agent_config_info().enable_tracking_noise) {
+    // 对周围车辆增加位置、航向扰动
     InjectObservationNoise();
     p_semantic_map_manager_->set_uncertain_vehicle_ids(uncertain_vehicle_ids_);
   }
@@ -46,7 +49,7 @@ ErrorType DataRenderer::Render(const double &time_stamp,
   TicToc timer;
   FakeMapper();
   // printf("[RayCasting]Time cost: %lf ms\n", timer.toc());
-
+  // 更新SemanticMapManager的成员变量，也就是更新语义地图
   p_semantic_map_manager_->UpdateSemanticMap(
       time_stamp_, ego_vehicle_, whole_lane_net_, surrounding_lane_net_,
       *p_obstacle_grid_, obs_grids_, surrounding_vehicles_);
@@ -124,7 +127,7 @@ ErrorType DataRenderer::GetObstacleMap(
   // ~ NOTICE:
   // ~ Origin of OccupancyGrid is at left-bottom corner,
   // ~ when x -> right, y -> up
-
+  // 以主车为中心建立 map
   decimal_t x = ego_state_.vec_position(0) - obstacle_map_info_.h_metric / 2.0;
   decimal_t y = ego_state_.vec_position(1) - obstacle_map_info_.w_metric / 2.0;
   // Aligning to global coordinate to improve consistency
@@ -135,7 +138,7 @@ ErrorType DataRenderer::GetObstacleMap(
   p_obstacle_grid_->fill_data(GridMap2D::UNKNOWN);
   std::array<decimal_t, 2> origin = {{x_r, y_r}};
   p_obstacle_grid_->set_origin(origin);
-
+  // 使用 opencv 库建立栅格地图，将opencv数据和栅格地图数据关联起来
   cv::Mat grid_mat =
       cv::Mat(obstacle_map_info_.height, obstacle_map_info_.width,
               CV_MAKETYPE(cv::DataType<ObstacleMapType>::type, 1),

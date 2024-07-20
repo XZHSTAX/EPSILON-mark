@@ -1,5 +1,4 @@
 #include "semantic_map_manager/visualizer.h"
-
 namespace semantic_map_manager {
 
 Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
@@ -24,6 +23,9 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
   std::string ego_vehicle_behavior_topic = std::string("/vis/agent_") +
                                            std::to_string(node_id_) +
                                            std::string("/ego_behavior_vis");
+  std::string record_ego_vehicle_behavior_topic = std::string("/record/agent_") +
+                                           std::to_string(node_id_) +
+                                           std::string("/ego_behavior_vis");
   std::string pred_intention_topic = std::string("/vis/agent_") +
                                      std::to_string(node_id_) +
                                      std::string("/pred_initial_intention_vis");
@@ -46,6 +48,8 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
       nh_.advertise<visualization_msgs::MarkerArray>(local_lanes_vis_topic, 1);
   behavior_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
       ego_vehicle_behavior_topic, 1);
+  record_behavior_vis_pub_ = nh_.advertise<std_msgs::String>(
+      record_ego_vehicle_behavior_topic, 1);
   pred_traj_openloop_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
       pred_traj_openloop_topic, 1);
   pred_intention_vis_pub_ =
@@ -87,6 +91,7 @@ void Visualizer::VisualizeDataWithStampForPlayback(
                               deleted_lane_ids);
   VisualizeLocalLanes(stamp, smm.local_lanes(), smm, deleted_lane_ids);
   VisualizeBehavior(stamp, smm.ego_behavior());
+  RecordVisualizeBehavior(stamp, smm.ego_behavior());
   VisualizeIntentionPrediction(stamp, smm.semantic_surrounding_vehicles());
   VisualizeOpenloopTrajPrediction(stamp, smm.openloop_pred_trajs());
   VisualizeSurroundingVehicles(stamp, smm.surrounding_vehicles(),
@@ -283,6 +288,47 @@ void Visualizer::VisualizeBehavior(const ros::Time &stamp,
 
   behavior_vis_pub_.publish(behavior_marker_arr);
 }
+
+// 将LateralBehavior枚举转换为字符串的函数
+std::string LateralBehaviorToString(common::LateralBehavior behavior) {
+  switch (behavior) {
+    case common::LateralBehavior::kLaneKeeping:
+      return "LaneKeeping";
+    case common::LateralBehavior::kLaneChangeLeft:
+      return "LaneChangeLeft";
+    case common::LateralBehavior::kLaneChangeRight:
+      return "LaneChangeRight";
+    default:
+      return "Undefined";
+  }
+}
+
+void Visualizer::RecordVisualizeBehavior(const ros::Time &stamp,
+                                   const common::SemanticBehavior &behavior) {
+  // 存储转换后的字符串
+  std::vector<std::string> behavior_strings_vec;
+  // 遍历behavior中的forward_behaviors
+  for (const auto &forward_behavior : behavior.forward_behaviors) {
+    // 将forward_behavior转换为字符串并存储到behavior_strings中
+    behavior_strings_vec.push_back(LateralBehaviorToString(forward_behavior));    
+  }
+  // 将behavior_strings中的内容以逗号分割组成一个字符串
+  std::ostringstream oss;
+  for (size_t i = 0; i < behavior_strings_vec.size(); ++i) {
+    if (i != 0) {
+      oss << ",";
+    }
+    oss << behavior_strings_vec[i];
+  }
+  std::string behavior_string = oss.str();
+
+  // 创建std_msgs::String消息并赋值
+  std_msgs::String msg;
+  msg.data = behavior_string;
+
+  record_behavior_vis_pub_.publish(msg);
+}
+
 
 void Visualizer::VisualizeSpeedLimit(
     const ros::Time &stamp, const vec_E<common::SpeedLimit> &speed_limits) {

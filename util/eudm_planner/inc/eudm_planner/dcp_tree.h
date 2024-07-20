@@ -65,6 +65,12 @@ class DcpTree {
 
   void set_ongoing_action(const DcpAction& a) { ongoing_action_ = a; }
 
+  /**
+   * @brief 获得成员变量action_script_,
+   * 
+   * action_script_是一个二维向量，第一个维度表示不同的动作序列，第二个维度表示动作序列中的动作
+   * @return std::vector<std::vector<DcpAction>>
+   */
   std::vector<std::vector<DcpAction>> action_script() const {
     return action_script_;
   }

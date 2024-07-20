@@ -317,7 +317,7 @@ class SemanticMapManager {
   common::LaneNet whole_lane_net_;
   common::LaneNet surrounding_lane_net_;
   common::SemanticLaneSet semantic_lane_set_;
-  common::SemanticBehavior ego_behavior_;
+  common::SemanticBehavior ego_behavior_;    // BP规划后，自车要执行的动作
 
   // * open loop prediction only for collision checking for onlane mp
   std::unordered_map<int, vec_E<common::State>> openloop_pred_trajs_;

@@ -32,6 +32,9 @@ void SscPlannerServer::PushSemanticMap(const SemanticMapManager& smm) {
   if (p_input_smm_buff_) p_input_smm_buff_->try_enqueue(smm);
 }
 
+/**
+ * 向phy_simulator_planning_node发送控制信号，topic方式，topic name为 control，被映射为/ctrl/agent_0
+*/
 void SscPlannerServer::PublishData() {
   using common::VisualizationUtil;
   auto current_time = ros::Time::now().toSec();
@@ -191,7 +194,7 @@ void SscPlannerServer::PlanCycleCallback() {
   // Update map
   auto map_ptr =
       std::make_shared<semantic_map_manager::SemanticMapManager>(last_smm_);
-  map_adapter_.set_map(map_ptr);
+  map_adapter_.set_map(map_ptr); // 获得map指针
 
   PublishData();
 

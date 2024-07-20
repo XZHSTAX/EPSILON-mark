@@ -207,6 +207,17 @@ ErrorType EudmPlannerMapAdapter::GetLocalLaneSamplesByState(
   return kSuccess;
 }
 
+/**
+ * @brief Get the reference lane for the given state and behavior 根据给定状态和行为获取参考车道，
+ * 先用给定状态获得最近车道，再用给定行为获取参考车道，结果存入lane中
+ * @param state 状态
+ * @param navi_path 导航路径，每没用
+ * @param behavior 行为
+ * @param max_forward_len 向前最大距离，如果表中没有，则获取，获取时要用
+ * @param max_backward_len 同上
+ * @param is_high_quality 是否高质量，获取时要用
+ * @param lane 参考车道
+*/
 ErrorType EudmPlannerMapAdapter::GetRefLaneForStateByBehavior(
     const State &state, const std::vector<int> &navi_path,
     const LateralBehavior &behavior, const decimal_t &max_forward_len,

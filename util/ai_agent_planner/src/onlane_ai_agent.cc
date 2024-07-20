@@ -167,6 +167,7 @@ int main(int argc, char** argv) {
   // std::uniform_int_distribution<int> dist_agg(1, 5);
   // aggressiveness_level = dist_agg(rng);
   // aggressiveness_level = 5;
+  // 根据aggressiveness_level设置idm的参数
   planning::MultiModalForward::ParamLookUp(aggressiveness_level, &sim_param);
   printf("[OnlaneAi]%d - aggresive: %d\n", ego_id, aggressiveness_level);
 

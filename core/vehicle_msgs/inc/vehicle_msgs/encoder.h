@@ -105,13 +105,14 @@ class Encoder {
     msg->d_cr = vehicle_param.d_cr();
     return kSuccess;
   }
-
+  // 其实就是把传入的lane_net转存到msg中，或者说把common::LaneNet转换成vehicle_msgs::LaneNet
   static ErrorType GetRosLaneNetFromLaneNet(const common::LaneNet &lane_net,
                                             const ros::Time &timestamp,
                                             const std::string &frame_id,
                                             vehicle_msgs::LaneNet *msg) {
     msg->header.frame_id = frame_id;
     msg->header.stamp = timestamp;
+    // 遍历所有的车道
     for (const auto lane_raw : lane_net.lane_set) {
       vehicle_msgs::Lane lane;
       GetRosLaneFromLaneRaw(lane_raw.second, timestamp, frame_id, &lane);
@@ -142,6 +143,7 @@ class Encoder {
     msg->final_point.x = lane.final_point(0);
     msg->final_point.y = lane.final_point(1);
     msg->final_point.z = 0.0;
+    // 遍历车道上的所有点
     for (const auto pt : lane.lane_points) {
       geometry_msgs::Point p;
       p.x = pt(0);
@@ -151,7 +153,7 @@ class Encoder {
     }
     return kSuccess;
   }
-
+  // 数据转换，把common::ObstacleSet转换成vehicle_msgs::ObstacleSet
   static ErrorType GetRosObstacleSetFromObstacleSet(
       const common::ObstacleSet &obstacle_set, const ros::Time &timestamp,
       const std::string &frame_id, vehicle_msgs::ObstacleSet *msg) {
@@ -238,7 +240,7 @@ class Encoder {
                                      &msg->obstacle_set);
     return kSuccess;
   }
-
+  // 格式转换，把 common::VehicleSet 转换成 vehicle_msgs::ArenaInfoDynamic
   static ErrorType GetRosArenaInfoDynamicFromSimulatorData(
       const common::VehicleSet &vehicle_set, const ros::Time &timestamp,
       const std::string &frame_id, vehicle_msgs::ArenaInfoDynamic *msg) {

@@ -6,7 +6,7 @@
 namespace common {
 struct State {
   decimal_t time_stamp{0.0};
-  Vecf<2> vec_position{Vecf<2>::Zero()};
+  Vecf<2> vec_position{Vecf<2>::Zero()};  // 车辆位置
   decimal_t angle{0.0};
   decimal_t curvature{0.0};
   decimal_t velocity{0.0};
