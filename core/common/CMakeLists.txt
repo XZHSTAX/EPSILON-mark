@@ -89,7 +89,7 @@ target_link_libraries(hkust_pl_common
     opencv_highgui
     hkust_pl_ooqp_itf
 )
-
+add_subdirectory(src/common/utils)
 #install the hearder files so that other packages can include.
 #install(DIRECTORY include/${PROJECT_NAME}/
 #   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
