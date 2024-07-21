@@ -83,8 +83,10 @@ class ArenaLoader {
    * @return false Parsing failed
    */
   ErrorType ParseLaneNetInfo(common::LaneNet *p_lane_net);
+  // 新的路网解析，从xdor来解析
+  ErrorType ParseLaneNetInfoFromXodr(common::LaneNet *p_lane_net);
 
- private:
+  private:
   std::string vehicle_set_path_;
   std::string map_path_;
   std::string lane_net_path_;

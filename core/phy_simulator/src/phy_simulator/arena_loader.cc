@@ -174,4 +174,16 @@ ErrorType ArenaLoader::ParseLaneNetInfo(common::LaneNet *p_lane_net) {
   return kSuccess;
 }
 
+ErrorType ArenaLoader::ParseLaneNetInfoFromXodr(common::LaneNet *p_lane_net) {
+  // 读取xodr文件
+
+  // 遍历其中的车道，把车道信息存入lane_raw
+  common::LaneRaw lane_raw;
+
+  // 把lane_raw的值一个个存入p_lane_net中
+  p_lane_net->lane_set.insert(
+    std::pair<int, common::LaneRaw>(lane_raw.id, lane_raw));
+  return kSuccess;
+}
+
 }  // namespace phy_simulator
