@@ -78,6 +78,10 @@ set(COMMON_SRC
     src/common/state/free_state.cc
     src/common/circle_arc/circle_arc.cc
     src/common/circle_arc/circle_arc_branch.cc
+    src/common/utils/color_map.cc
+    src/common/utils/common_visual.cc
+    src/common/utils/io_utils.cc
+    src/common/utils/math.cc
 )
 
 add_library(hkust_pl_common
@@ -89,6 +93,8 @@ target_link_libraries(hkust_pl_common
     opencv_highgui
     hkust_pl_ooqp_itf
 )
+
+# add_subdirectory(${PROJECT_SOURCE_DIR}/src/common/utils)
 
 #install the hearder files so that other packages can include.
 #install(DIRECTORY include/${PROJECT_NAME}/
