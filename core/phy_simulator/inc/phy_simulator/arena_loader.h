@@ -26,6 +26,8 @@
 
 #include "phy_simulator/basics.h"
 
+#include "hdmap/hdmap.h"
+
 namespace phy_simulator {
 
 class ArenaLoader {

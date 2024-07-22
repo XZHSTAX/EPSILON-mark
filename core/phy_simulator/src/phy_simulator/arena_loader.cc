@@ -176,7 +176,12 @@ ErrorType ArenaLoader::ParseLaneNetInfo(common::LaneNet *p_lane_net) {
 
 ErrorType ArenaLoader::ParseLaneNetInfoFromXodr(common::LaneNet *p_lane_net) {
   // 读取xodr文件
-
+  std::string town = "Town01";
+  std::string map = lane_net_path_ + town + ".txt";
+  std::string pcd = lane_net_path_ + "pcd/" + town + ".pcd";
+  // if (!hdmap::HdMap::GetMap().LoadMap(map, pcd)) {
+  //   return kUnknown;
+  // }
   // 遍历其中的车道，把车道信息存入lane_raw
   common::LaneRaw lane_raw;
 
