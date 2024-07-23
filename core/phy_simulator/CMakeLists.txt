@@ -18,6 +18,7 @@ find_package(Eigen3 REQUIRED)
 find_package(common REQUIRED)
 find_package(vehicle_model REQUIRED)
 find_package(vehicle_msgs REQUIRED)
+find_package(hdmap REQUIRED)
 
 #if this catkin packge's header is used by other packages, use catkin_package to
 #declare the include directories of this package.
@@ -32,6 +33,7 @@ include_directories(
     ${semantics_msgs_INCLUDE_DIRS}
     ${catkin_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
+    ${hdmap_INCLUDE_DIRS}
 )
 
 add_library(phy_simulator_lib
@@ -41,6 +43,14 @@ add_library(phy_simulator_lib
 target_link_libraries(phy_simulator_lib
     hkust_pl_vehicle_model
     hkust_pl_common
+    hdmap
+)
+message(STATUS "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+message(STATUS "hdmap_INCLUDE_DIRS: ${hdmap_INCLUDE_DIRS}")
+message(STATUS "------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+
+target_include_directories(phy_simulator_lib PUBLIC
+    ${hdmap_INCLUDE_DIR}
 )
 
 add_executable(phy_simulator_planning_node

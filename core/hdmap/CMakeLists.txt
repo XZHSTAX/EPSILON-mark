@@ -13,14 +13,18 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -march=native")
 
-catkin_package()
+# catkin_package()
+catkin_package(
+    INCLUDE_DIRS ../ ${ADMAP_INCLUDE_DIRS}  ${EIGEN3_INCLUDE_DIR} thirdparty/ad_map/spdlog/install/include ${std_msgs_INCLUDE_DIRS}
+    LIBRARIES hdmap
+    CATKIN_DEPENDS roscpp
+)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake/")
 find_package(Glog REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  std_msgs
 )
 
 set(ADMAP_INCLUDE_DIRS 
@@ -32,10 +36,9 @@ set(ADMAP_INCLUDE_DIRS
 )
 include_directories(SYSTEM ${EIGEN3_INCLUDE_DIR})
 include_directories(../)
+# include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(thirdparty/ad_map/spdlog/install/include)
 
-# include_directories(${common_INCLUDE_DIRS})
-# link_libraries(hkust_pl_common)
 include_directories(${std_msgs_INCLUDE_DIRS})
 add_subdirectory(thirdparty/ad_map)
 add_subdirectory(pointcloud)
@@ -44,7 +47,7 @@ add_subdirectory(road_network)
 add_subdirectory(routing)
 
 add_library(hdmap hdmap.cc hdmap_impl.cc)
-add_library(hdmap::hdmap ALIAS hdmap)
+# add_library(hdmap::hdmap ALIAS hdmap)
 target_link_libraries(hdmap
   hdmap::pointcloud
   hdmap::road_network

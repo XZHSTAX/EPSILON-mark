@@ -21,10 +21,10 @@ using LaneMapType =
 class LaneMap {
  public:
   static std::shared_ptr<Lane> GetLane(const LaneId &id);
-
- private:
   static LaneMapType lane_map_;
   static LaneMapType *mutable_lane_map();
+
+ private:
 
   LaneMap() = delete;
   LaneMap(const LaneMap &) = delete;

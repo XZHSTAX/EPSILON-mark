@@ -25,7 +25,9 @@
 #include "common/state/state.h"
 
 #include "phy_simulator/basics.h"
-
+#include "hdmap/hdmap.h"
+#include "hdmap/road_network/lane_map.h"
+#include "hdmap/road_network/road_network.h"
 namespace phy_simulator {
 
 class ArenaLoader {

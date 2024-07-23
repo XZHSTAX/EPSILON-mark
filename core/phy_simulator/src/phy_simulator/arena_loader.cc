@@ -176,13 +176,54 @@ ErrorType ArenaLoader::ParseLaneNetInfo(common::LaneNet *p_lane_net) {
 
 ErrorType ArenaLoader::ParseLaneNetInfoFromXodr(common::LaneNet *p_lane_net) {
   // 读取xodr文件
+  std::string town = "Town01";
+  std::string map = lane_net_path_ + town + ".txt";
+  std::string pcd = lane_net_path_ + "pcd/" + town + ".pcd";
+  if (!hdmap::HdMap::GetMap().LoadMap(map, pcd)) {
+    return kUnknown;
+  }
+
+  hdmap::LaneMapType& lane_map = *hdmap::LaneMap::mutable_lane_map();
 
   // 遍历其中的车道，把车道信息存入lane_raw
-  common::LaneRaw lane_raw;
+  for (const auto& itLane : lane_map) {
+    // const LaneId& laneId = itLane.first;  // 访问键（LaneId）
+    const std::shared_ptr<hdmap::Lane>& lane_hd = itLane.second;  // 访问值（shared_ptr<Lane>）
+    common::LaneRaw lane_raw;
 
-  // 把lane_raw的值一个个存入p_lane_net中
-  p_lane_net->lane_set.insert(
-    std::pair<int, common::LaneRaw>(lane_raw.id, lane_raw));
+    lane_raw.length = lane_hd->length();
+    lane_raw.l_change_avbl = lane_hd->LeftLaneChangable();
+    lane_raw.r_change_avbl = lane_hd->RightLaneChangable();
+    lane_raw.id = (int)lane_hd->id().value();
+    // 遍历lane_hd->next_lanes()返回的向量，对其中的值作类型转换，并存入lane_raw.child_id
+    for (const auto& lane_id : lane_hd->next_lanes()) {
+      lane_raw.child_id.push_back((int)lane_id.value());
+    }
+    // 遍历lane_hd->previous_lanes()返回的向量，对其中的值作类型转换，并存入lane_raw.father_id
+    for (const auto& lane_id : lane_hd->previous_lanes()) {
+      lane_raw.father_id.push_back((int)lane_id.value());
+    }
+    lane_raw.l_lane_id = (int)lane_hd->left_lane()->id().value();
+    lane_raw.r_lane_id = (int)lane_hd->right_lane()->id().value();
+
+    // std::vector<hdmap::WayPoint>& waypoints = lane_hd->waypoints();
+
+    // 遍历lane_hd->waypoints()，把返回的结构体的point值加入lane_raw.lane_points
+    for (const auto& waypoint : lane_hd->way_points()) {
+      Vec2f pt(waypoint.point[0],waypoint.point[1]);
+      lane_raw.lane_points.emplace_back(pt);
+    }
+    lane_raw.start_point = *(lane_raw.lane_points.begin());
+    lane_raw.final_point = *(lane_raw.lane_points.rbegin());
+
+    lane_raw.dir = 1;
+    lane_raw.behavior = "s";
+    // 把lane_raw的值一个个存入p_lane_net中
+    p_lane_net->lane_set.insert(
+      std::pair<int, common::LaneRaw>(lane_raw.id, lane_raw));
+  }
+  
+
   return kSuccess;
 }
 
