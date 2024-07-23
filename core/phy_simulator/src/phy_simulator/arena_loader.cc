@@ -203,12 +203,12 @@ ErrorType ArenaLoader::ParseLaneNetInfoFromXodr(common::LaneNet *p_lane_net) {
     for (const auto& lane_id : lane_hd->previous_lanes()) {
       lane_raw.father_id.push_back((int)lane_id.value());
     }
-    if(lane_hd->HasLeftNeighbor()){
+    if(lane_hd->HasLeftNeighbor() && lane_hd->left_lane() != nullptr ){
       lane_raw.l_lane_id = (int)lane_hd->left_lane()->id().value();
     } else{
       lane_raw.l_lane_id = 0;
     }
-    if(lane_hd->HasRightNeighbor()){
+    if(lane_hd->HasRightNeighbor() && lane_hd->right_lane() != nullptr){
       lane_raw.r_lane_id = (int)lane_hd->right_lane()->id().value();
     } else{
       lane_raw.r_lane_id = 0;

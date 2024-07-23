@@ -28,6 +28,7 @@ const double gt_static_msg_rate = 10.0;
 const double visualization_msg_rate = 20.0;
 
 common::VehicleControlSignalSet _signal_set;
+// ATTENTION: 用来接收控制信号的订阅者，组成一个集合
 std::vector<ros::Subscriber> _ros_sub;
 
 Vec3f initial_state(0, 0, 0);
@@ -35,7 +36,7 @@ bool flag_rcv_initial_state = false;
 
 Vec3f goal_state(0, 0, 0);
 bool flag_rcv_goal_state = false;
-
+// ATTENTION: 控制信号回调函数，主要是根据接收到的信号更新_signal_set的值
 void CtrlSignalCallback(const vehicle_msgs::ControlSignal::ConstPtr& msg,
                         int index) {
   common::VehicleControlSignal ctrl;
@@ -118,12 +119,13 @@ int main(int argc, char** argv) {
   int gt_msg_counter = 0;
   while (ros::ok()) {
     ros::spinOnce();
-
+    // ATTENTION 在此处根据控制信号更新车辆状态
     phy_sim.UpdateSimulatorUsingSignalSet(_signal_set, 1.0 / simulation_rate);
     // 动态信号，100Hz
     ros::Time tnow = ros::Time::now();
     if (tnow >= next_gt_pub_time) {
       next_gt_pub_time += ros::Duration(1.0 / gt_msg_rate);
+      // ATTENTION 发布所有车辆的状态
       ros_adapter.PublishDynamicDataWithStamp(tnow);
     }
     // 静态信号，除了timestmp，都是固定的；10Hz

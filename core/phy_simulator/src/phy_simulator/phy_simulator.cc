@@ -62,7 +62,9 @@ bool PhySimulation::SetupVehicleModelForVehicleSet() {
   }
   return true;
 }
-
+/** // ATTENTION 控制的前向模拟，更新vehicle_set_
+ * @note 根据signal_set和dt向车辆施加控制信号，并更新所有车辆的状态，更新vehicle_set_
+*/
 bool PhySimulation::UpdateSimulatorUsingSignalSet(
     const common::VehicleControlSignalSet &signal_set, const decimal_t &dt) {
   TicToc updata_vehicle_time;
@@ -72,6 +74,7 @@ bool PhySimulation::UpdateSimulatorUsingSignalSet(
 // 根据signal_set和dt向车辆施加控制信号，并更新车辆状态，更新vehicle_set_
 bool PhySimulation::UpdateVehicleStates(
     const common::VehicleControlSignalSet &signal_set, const decimal_t &dt) {
+  // 检查控制信号数量是否与车辆数量一致
   if (signal_set.signal_set.size() != vehicle_set_.vehicles.size()) {
     std::cerr << "[PhySimulation] ERROR - Signal number error." << std::endl;
     std::cerr << "[PhySimulation] signal_set num: "
@@ -80,6 +83,7 @@ bool PhySimulation::UpdateVehicleStates(
               << std::endl;
     assert(false);
   }
+  // 遍历所有车辆，根据控制信号更新车辆状态
   for (auto iter = vehicle_set_.vehicles.begin();
        iter != vehicle_set_.vehicles.end(); ++iter) {
     int id = iter->first;
@@ -90,10 +94,12 @@ bool PhySimulation::UpdateVehicleStates(
     auto model_iter = vehicle_model_set_.find(id);
 
     if (!signal.is_openloop) {
+      // 如果该车是闭环模拟，则施加控制（转向角和加速度），并通过车辆模型更新车辆状态
       model_iter->second.set_control(
           simulator::VehicleModel::Control(steer_rate, acc));
       model_iter->second.Step(dt);
     } else {
+      // 如果该车是开环模拟，则直接根据给出的下一个期望状态更新车辆状态
       model_iter->second.set_state(signal.state);
     }
     iter->second.set_state(model_iter->second.state());

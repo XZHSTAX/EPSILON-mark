@@ -35,6 +35,7 @@ bool HdMapImpl::LoadMap(const std::string& file, const std::string& pcd_file) {
   auto lane_ids = ::ad::map::lane::getLanes();
   for (size_t i = 0; i < lane_ids.size(); ++i) {
     auto admap_lane = ::ad::map::lane::getLanePtr(lane_ids[i]);
+    if(admap_lane->type == ::ad::map::lane::LaneType::SHOULDER || admap_lane->type == ::ad::map::lane::LaneType::PEDESTRIAN) continue;
     /* ad_map use ECEF coordinate, cache all ENU edges manually */
     ad::map::point::getCachedENUEdge(admap_lane->edgeLeft);
     ad::map::point::getCachedENUEdge(admap_lane->edgeRight);
@@ -43,9 +44,9 @@ bool HdMapImpl::LoadMap(const std::string& file, const std::string& pcd_file) {
     lane_map[admap_lane->id] = std::make_shared<Lane>(admap_lane);
   }
 
-  for (const auto& id : lane_ids) {
-    lane_map[id]->FindAllNeighborLanes();
-  }
+  // for (const auto& id : lane_ids) {
+  //   lane_map[id]->FindAllNeighborLanes();
+  // }
 
   // InitRos();
   // VisualizeHdMap(pcd_file);

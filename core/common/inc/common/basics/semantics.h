@@ -310,6 +310,7 @@ struct VehicleControlSignal {
 };
 
 struct VehicleControlSignalSet {
+  // 车辆控制信号，每个键表示不同的车辆，值表示控制信号
   std::unordered_map<int, VehicleControlSignal> signal_set;
 };
 

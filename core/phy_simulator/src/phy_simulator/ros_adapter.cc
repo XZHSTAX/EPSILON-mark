@@ -36,7 +36,7 @@ void RosAdapter::PublishStaticDataWithStamp(const ros::Time& stamp) {
       std::string("map"), &msg);
   arena_info_static_pub_.publish(msg);
 }
-
+// 动态话题发布，主要就是把p_phy_sim_->vehicle_set的内容发布出去；即把所有的车辆信息都发布出去
 void RosAdapter::PublishDynamicDataWithStamp(const ros::Time& stamp) {
   vehicle_msgs::ArenaInfoDynamic msg;
   vehicle_msgs::Encoder::GetRosArenaInfoDynamicFromSimulatorData(
