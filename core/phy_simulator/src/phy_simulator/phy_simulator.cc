@@ -25,7 +25,8 @@ bool PhySimulation::GetDataFromArenaLoader() {
   std::cout << "[PhySimulation] Parsing simulation info..." << std::endl;
   p_arena_loader_->ParseVehicleSet(&vehicle_set_);
   p_arena_loader_->ParseMapInfo(&obstacle_set_);
-  p_arena_loader_->ParseLaneNetInfo(&lane_net_);
+  // p_arena_loader_->ParseLaneNetInfo(&lane_net_);
+  p_arena_loader_->ParseLaneNetInfoFromXodr(&lane_net_);
   return true;
 }
 

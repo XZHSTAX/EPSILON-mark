@@ -47,8 +47,8 @@ bool HdMapImpl::LoadMap(const std::string& file, const std::string& pcd_file) {
     lane_map[id]->FindAllNeighborLanes();
   }
 
-  InitRos();
-  VisualizeHdMap(pcd_file);
+  // InitRos();
+  // VisualizeHdMap(pcd_file);
 
   return true;
 }

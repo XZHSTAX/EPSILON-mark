@@ -203,8 +203,19 @@ ErrorType ArenaLoader::ParseLaneNetInfoFromXodr(common::LaneNet *p_lane_net) {
     for (const auto& lane_id : lane_hd->previous_lanes()) {
       lane_raw.father_id.push_back((int)lane_id.value());
     }
-    lane_raw.l_lane_id = (int)lane_hd->left_lane()->id().value();
-    lane_raw.r_lane_id = (int)lane_hd->right_lane()->id().value();
+    if(lane_hd->HasLeftNeighbor()){
+      lane_raw.l_lane_id = (int)lane_hd->left_lane()->id().value();
+    } else{
+      lane_raw.l_lane_id = 0;
+    }
+    if(lane_hd->HasRightNeighbor()){
+      lane_raw.r_lane_id = (int)lane_hd->right_lane()->id().value();
+    } else{
+      lane_raw.r_lane_id = 0;
+    }
+    
+    
+    
 
     // std::vector<hdmap::WayPoint>& waypoints = lane_hd->waypoints();
 
