@@ -5,7 +5,7 @@
   <arg name="ctrl_topic" value="/ctrl/agent_0" />
 
   <!-- ATTENTION:XZH 这里可以换地图 -->
-  <arg name="playground" value = "carla_map1" />
+  <arg name="playground" default = "carla_map1" />
   <!-- <arg name="playground" value = "ring_tiny_v1.0" /> -->
   <!-- <arg name="playground" value = "ring_small_v1.0" /> -->
 
