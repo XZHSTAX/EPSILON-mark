@@ -1,0 +1,32 @@
+{
+  "agent_config": {
+    "_COMMENT": "[AgentConfig] - START",
+    "num": 2,
+    "info": [
+      {
+        "id": 0,
+        "type": "car",
+        "obstacle_map_meta_info": {
+          "width": 1000,
+          "height": 1000,
+          "resolution": 0.2
+        },
+        "surrounding_search_radius": 150.0,
+        "enable_openloop_prediction": true
+      },
+      {
+        "id": 1,
+        "type": "car",
+        "obstacle_map_meta_info": {
+          "width": 100,
+          "height": 100,
+          "resolution": 0.5
+        },
+        "surrounding_search_radius": 150.0,
+        "enable_openloop_prediction": false,
+        "enable_fast_lane_lut": false
+      }
+    ],
+    "__COMMENT": "[AgentConfig] - END"
+  }
+}

@@ -1,19 +1,21 @@
 <launch>
     <!-- 设置车辆信息位置从何处读取 -->
-    <arg name="playground" default = "carla_map1" />
-    <arg name="lane_net_path" default="/home/xzh/ros1/BPws/src/EPSILON/core/hdmap/maps/Town01.txt" />
+    <arg name="playground" default = "carla_map4" />
+    <arg name="lane_net_path" default="/home/xzh/ros1/BPws/src/EPSILON/core/hdmap/maps/Town04.txt" />
 
     <include file="$(find planning_integrated)/launch/eudm_carla_map.launch">
         <arg name="playground" value="$(arg playground)" />
     </include>
     
-    <!-- <include file="$(find ai_agent_planner)/launch/onlane_ai_agent_start.launch" /> -->
-    
+    <include file="$(find ai_agent_planner)/launch/onlane_ai_agent_xodr.launch">
+        <arg name="playground" value="$(arg playground)" />
+    </include>
+
     <include file="$(find phy_simulator)/launch/phy_simulator_planning_xodrMap.launch">
         <arg name="playground" value="$(arg playground)" />
         <arg name="lane_net_path" value="$(arg lane_net_path)" />
     </include>
     
-    <!-- <node pkg="rviz" type="rviz" name="rviz"
-    args="-d $(find phy_simulator)/rviz/phy_simulator_planning_start.rviz"/> -->
+    <node pkg="rviz" type="rviz" name="rviz"
+    args="-d $(find phy_simulator)/rviz/phy_simulator_planning_start.rviz"/>
 </launch>
