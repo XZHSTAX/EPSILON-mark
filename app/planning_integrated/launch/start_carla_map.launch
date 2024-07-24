@@ -3,14 +3,18 @@
     <arg name="playground" default = "carla_map4" />
     <arg name="lane_net_path" default="/home/xzh/ros1/BPws/src/EPSILON/core/hdmap/maps/Town04.txt" />
 
+    <!-- 只利用playground中的agent_config_path -->
     <include file="$(find planning_integrated)/launch/eudm_carla_map.launch">
         <arg name="playground" value="$(arg playground)" />
     </include>
     
+    <!-- 只利用playground中的agent_config_path -->
     <include file="$(find ai_agent_planner)/launch/onlane_ai_agent_xodr.launch">
         <arg name="playground" value="$(arg playground)" />
     </include>
 
+    <!-- playground中的map_path和vehicle_info_path -->
+    <!-- 实际上还会利用lane_net_path，但是我修改了lane_net_path的路径 -->
     <include file="$(find phy_simulator)/launch/phy_simulator_planning_xodrMap.launch">
         <arg name="playground" value="$(arg playground)" />
         <arg name="lane_net_path" value="$(arg lane_net_path)" />
