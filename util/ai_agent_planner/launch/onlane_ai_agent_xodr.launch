@@ -2,12 +2,12 @@
   <arg name="arena_info_topic" value="/arena_info" />
   <arg name="arena_info_static_topic" value="/arena_info_static" />
   <arg name="arena_info_dynamic_topic" value="/arena_info_dynamic" />
-
+  <!-- ATTENTION: 设置其他agent车辆速度 -->
   <arg name="global_desired_vel" value = "10.0" />
   <arg name="global_autonomous_level" value = "2" />
   <arg name="global_aggressiveness_level" value = "4" />
 
-  <arg name="playground" default = "carla_map1" />
+  <arg name="playground" default = "carla_map4" />
 
   <node pkg="ai_agent_planner" type="onlane_ai_agent" name="onlane_ai_agent_1" output="screen">
     <param name="ego_id" type="int" value="1" />

@@ -36,7 +36,7 @@
         "init_state": {
           "x": 247.15,
           "y": 367.60,
-          "angle": -1.132,
+          "angle": 0.0,
           "curvature": 0.0,
           "velocity": 0.0,
           "acceleration": 0.0,

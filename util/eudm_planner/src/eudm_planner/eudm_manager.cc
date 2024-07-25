@@ -702,6 +702,9 @@ void EudmManager::ConstructBehavior(common::SemanticBehavior* behavior) {
                                                         last_snapshot_.forward_trajs[selected_seq_id]};
   behavior->forward_behaviors = std::vector<LateralBehavior>{
                                                         last_snapshot_.forward_lat_behaviors[selected_seq_id].front()};
+  behavior->forward_behaviors2 = std::vector<LateralBehavior>{
+                                                      last_snapshot_.forward_lat_behaviors[selected_seq_id]};
+  // ATTENTION: 如果以后要添加新的行为记录，在这里添加赋值语句
   behavior->surround_trajs = surround_trajs_final;
   behavior->state = last_snapshot_.plan_state;
   behavior->ref_lane = last_snapshot_.ref_lane;

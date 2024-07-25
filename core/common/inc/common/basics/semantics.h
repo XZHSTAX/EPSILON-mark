@@ -225,6 +225,8 @@ struct SemanticBehavior {
 
   vec_E<vec_E<Vehicle>> forward_trajs;
   std::vector<LateralBehavior> forward_behaviors;
+  std::vector<LateralBehavior> forward_behaviors2;
+  // ATTENTION: 如果以后要添加新的行为记录，写新的变量
   vec_E<std::unordered_map<int, vec_E<Vehicle>>> surround_trajs;
 
   State state;

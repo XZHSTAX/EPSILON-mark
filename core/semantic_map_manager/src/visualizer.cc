@@ -48,8 +48,10 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
       nh_.advertise<visualization_msgs::MarkerArray>(local_lanes_vis_topic, 1);
   behavior_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
       ego_vehicle_behavior_topic, 1);
+  // record_behavior_vis_pub_ = nh_.advertise<std_msgs::Int32MultiArray>(
+  //     record_ego_vehicle_behavior_topic, 10);
   record_behavior_vis_pub_ = nh_.advertise<std_msgs::String>(
-      record_ego_vehicle_behavior_topic, 1);
+      record_ego_vehicle_behavior_topic, 10);
   pred_traj_openloop_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
       pred_traj_openloop_topic, 1);
   pred_intention_vis_pub_ =
@@ -75,6 +77,8 @@ void Visualizer::VisualizeDataWithStamp(const ros::Time &stamp,
                               std::vector<int>());
   VisualizeLocalLanes(stamp, smm.local_lanes(), smm, std::vector<int>());
   VisualizeBehavior(stamp, smm.ego_behavior());
+  // ATTENTION：数据记录都在此处，可以保证timestamp的一致性
+  RecordVisualizeBehavior(stamp, smm.ego_behavior());
   VisualizeIntentionPrediction(stamp, smm.semantic_surrounding_vehicles());
   VisualizeOpenloopTrajPrediction(stamp, smm.openloop_pred_trajs());
   VisualizeSurroundingVehicles(stamp, smm.surrounding_vehicles(),
@@ -91,7 +95,6 @@ void Visualizer::VisualizeDataWithStampForPlayback(
                               deleted_lane_ids);
   VisualizeLocalLanes(stamp, smm.local_lanes(), smm, deleted_lane_ids);
   VisualizeBehavior(stamp, smm.ego_behavior());
-  RecordVisualizeBehavior(stamp, smm.ego_behavior());
   VisualizeIntentionPrediction(stamp, smm.semantic_surrounding_vehicles());
   VisualizeOpenloopTrajPrediction(stamp, smm.openloop_pred_trajs());
   VisualizeSurroundingVehicles(stamp, smm.surrounding_vehicles(),
@@ -303,12 +306,25 @@ std::string LateralBehaviorToString(common::LateralBehavior behavior) {
   }
 }
 
+int LateralBehaviorToInt(common::LateralBehavior behavior) {
+  switch (behavior) {
+    case common::LateralBehavior::kLaneKeeping:
+      return 1;
+    case common::LateralBehavior::kLaneChangeLeft:
+      return 2;
+    case common::LateralBehavior::kLaneChangeRight:
+      return 3;
+    default:
+      return 0;
+  }
+}
+
 void Visualizer::RecordVisualizeBehavior(const ros::Time &stamp,
                                    const common::SemanticBehavior &behavior) {
   // 存储转换后的字符串
   std::vector<std::string> behavior_strings_vec;
   // 遍历behavior中的forward_behaviors
-  for (const auto &forward_behavior : behavior.forward_behaviors) {
+  for (const auto &forward_behavior : behavior.forward_behaviors2) {
     // 将forward_behavior转换为字符串并存储到behavior_strings中
     behavior_strings_vec.push_back(LateralBehaviorToString(forward_behavior));    
   }
@@ -321,11 +337,19 @@ void Visualizer::RecordVisualizeBehavior(const ros::Time &stamp,
     oss << behavior_strings_vec[i];
   }
   std::string behavior_string = oss.str();
-
+  
   // 创建std_msgs::String消息并赋值
   std_msgs::String msg;
   msg.data = behavior_string;
 
+  // std::vector<int> behavior_vec;
+  // for (const auto &forward_behavior : behavior.forward_behaviors) {
+  //   // 将forward_behavior转换为字符串并存储到behavior_strings中
+  //   behavior_vec.push_back(LateralBehaviorToInt(forward_behavior));    
+  // }
+
+  // std_msgs::Int32MultiArray msg;
+  // msg.data = behavior_vec;
   record_behavior_vis_pub_.publish(msg);
 }
 

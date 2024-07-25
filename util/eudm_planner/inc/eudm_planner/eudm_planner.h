@@ -345,7 +345,7 @@ class EudmPlanner : public Planner {
   // * setup
   Cfg cfg_;
   LaneChangeInfo lc_info_;
-  decimal_t desired_velocity_{5.0};
+  decimal_t desired_velocity_{5.0};        // eudm的期望速度，实际上是从launch文件中读取的
   decimal_t sim_time_total_ = 0.0;
   std::set<int> pre_deleted_seq_ids_;      // 预删除动作序列的id的集合；记录不合理的动作序列的id，比如先向左变道又向右变道
   int ego_lane_id_{kInvalidLaneId};

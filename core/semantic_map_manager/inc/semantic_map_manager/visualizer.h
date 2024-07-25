@@ -15,6 +15,7 @@
 #include "common/visualization/common_visualization_util.h"
 #include "semantic_map_manager/semantic_map_manager.h"
 #include <std_msgs/String.h>
+#include <std_msgs/Int32MultiArray.h>
 namespace semantic_map_manager {
 
 class Visualizer {

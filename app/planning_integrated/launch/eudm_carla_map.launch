@@ -4,12 +4,12 @@
 
   <arg name="ctrl_topic" value="/ctrl/agent_0" />
 
-  <!-- ATTENTION:XZH 这里可以换地图 -->
   <arg name="playground" default = "carla_map1" />
   <!-- <arg name="playground" value = "ring_tiny_v1.0" /> -->
   <!-- <arg name="playground" value = "ring_small_v1.0" /> -->
 
   <!-- type：节点名称，name：给节点命名 -->
+  <!--ATTENTION: desired_vel设置主车的目标速度 -->
   <node pkg="planning_integrated"
         type="test_ssc_with_eudm"
         name="test_ssc_with_eudm_0"
