@@ -44,6 +44,9 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
   std::string record_ego_vehicle_topic = std::string("/record/agent_") +
                                   std::to_string(node_id_) +
                                   std::string("/ego_vehicle_status");
+  std::string record_local_lanes_topic = std::string("/record/agent_") +
+                                  std::to_string(node_id_) +
+                                  std::string("/LocalLanes");                                
   ego_vehicle_pub_ =
       nh_.advertise<visualization_msgs::MarkerArray>(ego_vehicle_vis_topic, 1);
   obstacle_map_pub_ =
@@ -63,6 +66,8 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
       nh_.advertise<vehicle_msgs::ForwardTrajsRecord>(record_forward_traj_topic, 10);
   record_ego_vehicle_pub_ =
       nh_.advertise<vehicle_msgs::Vehicle>(record_ego_vehicle_topic, 10);
+  record_local_lanes_pub_ =
+      nh_.advertise<vehicle_msgs::LaneNet>(record_local_lanes_topic, 10);
 
   pred_traj_openloop_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
       pred_traj_openloop_topic, 1);
@@ -93,6 +98,7 @@ void Visualizer::VisualizeDataWithStamp(const ros::Time &stamp,
   RecordVisualizeBehavior(stamp, smm.ego_behavior());
   RecordVisualizeForwardTrajectories(stamp, smm.ego_behavior());
   RecordEgoVehicle(stamp, smm.ego_vehicle());
+  // RecordSurroundingLanes(stamp,smm.surrounding_lane_net());
   VisualizeIntentionPrediction(stamp, smm.semantic_surrounding_vehicles());
   VisualizeOpenloopTrajPrediction(stamp, smm.openloop_pred_trajs());
   VisualizeSurroundingVehicles(stamp, smm.surrounding_vehicles(),
@@ -396,6 +402,13 @@ void Visualizer::RecordEgoVehicle(const ros::Time &stamp, const common::Vehicle 
   vehicle_msgs::Vehicle msg;
   vehicle_msgs::Encoder::GetRosVehicleFromVehicle(ego_vehicle,stamp,"map",&msg);
   record_ego_vehicle_pub_.publish(msg);
+}
+
+// 发布的信息过大，暂时不用了；周边车道信息由VisualizeLocalLanes记录
+void Visualizer::RecordSurroundingLanes(const ros::Time &stamp,const common::LaneNet &lane_net){
+  vehicle_msgs::LaneNet msg;
+  vehicle_msgs::Encoder::GetRosLaneNetFromLaneNet(lane_net,stamp,"map",&msg);
+  record_local_lanes_pub_.publish(msg);
 }
 
 void Visualizer::VisualizeSpeedLimit(

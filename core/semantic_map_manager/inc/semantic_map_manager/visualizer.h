@@ -23,6 +23,9 @@
 #include "vehicle_msgs/ForwardTrajPoint.h"
 #include "vehicle_msgs/Vehicle.h"
 #include "vehicle_msgs/encoder.h"
+#include "vehicle_msgs/LaneNet.h"
+#include "vehicle_msgs/Lane.h"
+
 namespace semantic_map_manager {
 
 class Visualizer {
@@ -72,6 +75,7 @@ class Visualizer {
       const std::unordered_map<int, vec_E<common::State>> &openloop_pred_trajs);
   void VisualizeSpeedLimit(const ros::Time &stamp,
                            const vec_E<common::SpeedLimit> &speed_limits);
+  void RecordSurroundingLanes(const ros::Time &stamp,const common::LaneNet &lane_net);
 
   int last_traj_list_marker_cnt_ = 0;
   int last_intention_marker_cnt_ = 0;
@@ -90,14 +94,15 @@ class Visualizer {
   ros::Publisher surrounding_lane_net_pub_;
   ros::Publisher local_lanes_pub_;
   ros::Publisher behavior_vis_pub_;
-  ros::Publisher record_behavior_vis_pub_;
   ros::Publisher pred_traj_openloop_vis_pub_;
   ros::Publisher pred_intention_vis_pub_;
   ros::Publisher surrounding_vehicle_vis_pub_;
   ros::Publisher speed_limit_vis_pub_;
 
+  ros::Publisher record_behavior_vis_pub_;
   ros::Publisher record_forward_traj_vis_pub_;
   ros::Publisher record_ego_vehicle_pub_;
+  ros::Publisher record_local_lanes_pub_;
   
   tf::TransformBroadcaster ego_to_map_tf_;
   decimal_t marker_lifetime_{0.05};
