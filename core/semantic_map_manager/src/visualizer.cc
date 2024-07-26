@@ -23,9 +23,6 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
   std::string ego_vehicle_behavior_topic = std::string("/vis/agent_") +
                                            std::to_string(node_id_) +
                                            std::string("/ego_behavior_vis");
-  std::string record_ego_vehicle_behavior_topic = std::string("/record/agent_") +
-                                           std::to_string(node_id_) +
-                                           std::string("/ego_behavior_vis");
   std::string pred_intention_topic = std::string("/vis/agent_") +
                                      std::to_string(node_id_) +
                                      std::string("/pred_initial_intention_vis");
@@ -38,10 +35,15 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
   std::string speed_limit_topic = std::string("/vis/agent_") +
                                   std::to_string(node_id_) +
                                   std::string("/speed_limit");
+  std::string record_ego_vehicle_behavior_topic = std::string("/record/agent_") +
+                                          std::to_string(node_id_) +
+                                          std::string("/ego_behavior_vis");
   std::string record_forward_traj_topic = std::string("/record/agent_") +
                                   std::to_string(node_id_) +
                                   std::string("/forward_trajs");
-
+  std::string record_ego_vehicle_topic = std::string("/record/agent_") +
+                                  std::to_string(node_id_) +
+                                  std::string("/ego_vehicle_status");
   ego_vehicle_pub_ =
       nh_.advertise<visualization_msgs::MarkerArray>(ego_vehicle_vis_topic, 1);
   obstacle_map_pub_ =
@@ -55,10 +57,12 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
   
   // record_behavior_vis_pub_ = nh_.advertise<vehicle_msgs::BehaviorIntArray>(
   //     record_ego_vehicle_behavior_topic, 10);
-  record_behavior_vis_pub_ = nh_.advertise<vehicle_msgs::BehaviorString>(
-      record_ego_vehicle_behavior_topic, 10);
+  record_behavior_vis_pub_ = 
+      nh_.advertise<vehicle_msgs::BehaviorString>(record_ego_vehicle_behavior_topic, 10);
   record_forward_traj_vis_pub_ =
-      nh_.advertise<vehicle_msgs::ForwardTrajsRecord>(record_forward_traj_topic, 1);
+      nh_.advertise<vehicle_msgs::ForwardTrajsRecord>(record_forward_traj_topic, 10);
+  record_ego_vehicle_pub_ =
+      nh_.advertise<vehicle_msgs::Vehicle>(record_ego_vehicle_topic, 10);
 
   pred_traj_openloop_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
       pred_traj_openloop_topic, 1);
@@ -88,6 +92,7 @@ void Visualizer::VisualizeDataWithStamp(const ros::Time &stamp,
   // ATTENTION：数据记录都在此处，可以保证timestamp的一致性
   RecordVisualizeBehavior(stamp, smm.ego_behavior());
   RecordVisualizeForwardTrajectories(stamp, smm.ego_behavior());
+  RecordEgoVehicle(stamp, smm.ego_vehicle());
   VisualizeIntentionPrediction(stamp, smm.semantic_surrounding_vehicles());
   VisualizeOpenloopTrajPrediction(stamp, smm.openloop_pred_trajs());
   VisualizeSurroundingVehicles(stamp, smm.surrounding_vehicles(),
@@ -385,6 +390,12 @@ void Visualizer::RecordVisualizeForwardTrajectories(const ros::Time& stamp,const
   }
   record_forward_traj_vis_pub_.publish(msg);
 
+}
+
+void Visualizer::RecordEgoVehicle(const ros::Time &stamp, const common::Vehicle &ego_vehicle) {
+  vehicle_msgs::Vehicle msg;
+  vehicle_msgs::Encoder::GetRosVehicleFromVehicle(ego_vehicle,stamp,"map",&msg);
+  record_ego_vehicle_pub_.publish(msg);
 }
 
 void Visualizer::VisualizeSpeedLimit(

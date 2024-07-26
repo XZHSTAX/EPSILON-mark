@@ -21,6 +21,8 @@
 #include "vehicle_msgs/ForwardTrajsRecord.h"
 #include "vehicle_msgs/ForwardTraj.h"
 #include "vehicle_msgs/ForwardTrajPoint.h"
+#include "vehicle_msgs/Vehicle.h"
+#include "vehicle_msgs/encoder.h"
 namespace semantic_map_manager {
 
 class Visualizer {
@@ -50,6 +52,8 @@ class Visualizer {
                          const common::SemanticBehavior &behavior);
   void RecordVisualizeForwardTrajectories(const ros::Time& stamp,
                          const common::SemanticBehavior &behavior);
+  void RecordEgoVehicle(const ros::Time &stamp,
+                         const common::Vehicle &ego_vehicle);
   void VisualizeSurroundingVehicles(const ros::Time &stamp,
                                     const common::VehicleSet &vehicle_set,
                                     const std::vector<int> &nearby_ids);
@@ -93,6 +97,7 @@ class Visualizer {
   ros::Publisher speed_limit_vis_pub_;
 
   ros::Publisher record_forward_traj_vis_pub_;
+  ros::Publisher record_ego_vehicle_pub_;
   
   tf::TransformBroadcaster ego_to_map_tf_;
   decimal_t marker_lifetime_{0.05};
