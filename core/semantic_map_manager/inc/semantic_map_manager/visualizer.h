@@ -16,6 +16,8 @@
 #include "semantic_map_manager/semantic_map_manager.h"
 #include <std_msgs/String.h>
 #include <std_msgs/Int32MultiArray.h>
+#include "vehicle_msgs/BehaviorIntArray.h"
+#include "vehicle_msgs/BehaviorString.h"
 namespace semantic_map_manager {
 
 class Visualizer {

@@ -48,9 +48,9 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
       nh_.advertise<visualization_msgs::MarkerArray>(local_lanes_vis_topic, 1);
   behavior_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
       ego_vehicle_behavior_topic, 1);
-  // record_behavior_vis_pub_ = nh_.advertise<std_msgs::Int32MultiArray>(
+  // record_behavior_vis_pub_ = nh_.advertise<vehicle_msgs::BehaviorIntArray>(
   //     record_ego_vehicle_behavior_topic, 10);
-  record_behavior_vis_pub_ = nh_.advertise<std_msgs::String>(
+  record_behavior_vis_pub_ = nh_.advertise<vehicle_msgs::BehaviorString>(
       record_ego_vehicle_behavior_topic, 10);
   pred_traj_openloop_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
       pred_traj_openloop_topic, 1);
@@ -339,8 +339,9 @@ void Visualizer::RecordVisualizeBehavior(const ros::Time &stamp,
   std::string behavior_string = oss.str();
   
   // 创建std_msgs::String消息并赋值
-  std_msgs::String msg;
-  msg.data = behavior_string;
+  vehicle_msgs::BehaviorString msg;
+  msg.Behavior = behavior_string;
+  msg.header.stamp =  stamp;
 
   // std::vector<int> behavior_vec;
   // for (const auto &forward_behavior : behavior.forward_behaviors) {
@@ -348,8 +349,10 @@ void Visualizer::RecordVisualizeBehavior(const ros::Time &stamp,
   //   behavior_vec.push_back(LateralBehaviorToInt(forward_behavior));    
   // }
 
-  // std_msgs::Int32MultiArray msg;
-  // msg.data = behavior_vec;
+  // vehicle_msgs::BehaviorIntArray msg;
+  // msg.Behavior = behavior_vec;
+  // msg.header.stamp =  stamp;
+
   record_behavior_vis_pub_.publish(msg);
 }
 

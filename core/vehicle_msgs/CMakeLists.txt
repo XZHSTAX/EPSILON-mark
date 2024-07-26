@@ -78,6 +78,8 @@ add_message_files(
   ArenaInfo.msg
   ArenaInfoDynamic.msg
   ArenaInfoStatic.msg
+  BehaviorIntArray.msg
+  BehaviorString.msg
 )
 
 generate_messages(
