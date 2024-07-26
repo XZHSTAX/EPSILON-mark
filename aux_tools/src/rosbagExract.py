@@ -8,6 +8,7 @@ print(info)
 topic_name1 = "/record/agent_0/ego_behavior_vis"
 topic_name2 = "/record/agent_0/ego_vehicle_status"
 topic_name3 = "/record/agent_0/forward_trajs"
+topic_name4 = "/vis/agent_0/local_lanes_vis"
 
 # 记录每个时间步的behavior
 behavior_record = []
@@ -41,8 +42,18 @@ for topic, msg, t in perception_data:
                 tra_record.append([point.x, point.y])
             current_time_trajs.append(tra_record)
         forward_trajs_record.append(current_time_trajs)
+
+Local_lanes_record = []
+perception_data = bag_data.read_messages(topic_name4)
+for topic, msg, t in perception_data:
+    if msg is not None:
+        Local_lanes_record_current = []
+        for lane in msg.markers:
+            Local_lane = []
+            for point in lane.points:
+                Local_lane.append([point.x, point.y])
+            Local_lanes_record_current.append(Local_lane)
+        Local_lanes_record.append(Local_lanes_record_current)
         
-
-
 bag_data.close()
 
