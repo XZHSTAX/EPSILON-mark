@@ -38,6 +38,10 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
   std::string speed_limit_topic = std::string("/vis/agent_") +
                                   std::to_string(node_id_) +
                                   std::string("/speed_limit");
+  std::string record_forward_traj_topic = std::string("/record/agent_") +
+                                  std::to_string(node_id_) +
+                                  std::string("/forward_trajs");
+
   ego_vehicle_pub_ =
       nh_.advertise<visualization_msgs::MarkerArray>(ego_vehicle_vis_topic, 1);
   obstacle_map_pub_ =
@@ -48,10 +52,14 @@ Visualizer::Visualizer(ros::NodeHandle nh, int node_id)
       nh_.advertise<visualization_msgs::MarkerArray>(local_lanes_vis_topic, 1);
   behavior_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
       ego_vehicle_behavior_topic, 1);
+  
   // record_behavior_vis_pub_ = nh_.advertise<vehicle_msgs::BehaviorIntArray>(
   //     record_ego_vehicle_behavior_topic, 10);
   record_behavior_vis_pub_ = nh_.advertise<vehicle_msgs::BehaviorString>(
       record_ego_vehicle_behavior_topic, 10);
+  record_forward_traj_vis_pub_ =
+      nh_.advertise<vehicle_msgs::ForwardTrajsRecord>(record_forward_traj_topic, 1);
+
   pred_traj_openloop_vis_pub_ = nh_.advertise<visualization_msgs::MarkerArray>(
       pred_traj_openloop_topic, 1);
   pred_intention_vis_pub_ =
@@ -79,6 +87,7 @@ void Visualizer::VisualizeDataWithStamp(const ros::Time &stamp,
   VisualizeBehavior(stamp, smm.ego_behavior());
   // ATTENTION：数据记录都在此处，可以保证timestamp的一致性
   RecordVisualizeBehavior(stamp, smm.ego_behavior());
+  RecordVisualizeForwardTrajectories(stamp, smm.ego_behavior());
   VisualizeIntentionPrediction(stamp, smm.semantic_surrounding_vehicles());
   VisualizeOpenloopTrajPrediction(stamp, smm.openloop_pred_trajs());
   VisualizeSurroundingVehicles(stamp, smm.surrounding_vehicles(),
@@ -356,6 +365,27 @@ void Visualizer::RecordVisualizeBehavior(const ros::Time &stamp,
   record_behavior_vis_pub_.publish(msg);
 }
 
+void Visualizer::RecordVisualizeForwardTrajectories(const ros::Time& stamp,const common::SemanticBehavior &behavior) {
+  auto forward_trajs = behavior.forward_trajs2;
+  vehicle_msgs::ForwardTrajsRecord msg;
+  msg.header.stamp = stamp;
+
+  // 遍历behavior.forward_trajs中的每个轨迹
+  for (const auto& forward_traj : forward_trajs) {
+    vehicle_msgs::ForwardTraj traj_msg;
+    // 遍历轨迹上的每个点
+    for (const auto& v : forward_traj) {
+      // 将每个点的位置信息存储到msg中
+      vehicle_msgs::ForwardTrajPoint point_msg;
+      point_msg.x = v.state().vec_position(0);
+      point_msg.y = v.state().vec_position(1);
+      traj_msg.forward_trajs.push_back(point_msg);
+    }
+    msg.forward_trajs_record.push_back(traj_msg);
+  }
+  record_forward_traj_vis_pub_.publish(msg);
+
+}
 
 void Visualizer::VisualizeSpeedLimit(
     const ros::Time &stamp, const vec_E<common::SpeedLimit> &speed_limits) {

@@ -18,6 +18,9 @@
 #include <std_msgs/Int32MultiArray.h>
 #include "vehicle_msgs/BehaviorIntArray.h"
 #include "vehicle_msgs/BehaviorString.h"
+#include "vehicle_msgs/ForwardTrajsRecord.h"
+#include "vehicle_msgs/ForwardTraj.h"
+#include "vehicle_msgs/ForwardTrajPoint.h"
 namespace semantic_map_manager {
 
 class Visualizer {
@@ -44,6 +47,8 @@ class Visualizer {
   void VisualizeBehavior(const ros::Time &stamp,
                          const common::SemanticBehavior &behavior);
   void RecordVisualizeBehavior(const ros::Time &stamp,
+                         const common::SemanticBehavior &behavior);
+  void RecordVisualizeForwardTrajectories(const ros::Time& stamp,
                          const common::SemanticBehavior &behavior);
   void VisualizeSurroundingVehicles(const ros::Time &stamp,
                                     const common::VehicleSet &vehicle_set,
@@ -86,6 +91,9 @@ class Visualizer {
   ros::Publisher pred_intention_vis_pub_;
   ros::Publisher surrounding_vehicle_vis_pub_;
   ros::Publisher speed_limit_vis_pub_;
+
+  ros::Publisher record_forward_traj_vis_pub_;
+  
   tf::TransformBroadcaster ego_to_map_tf_;
   decimal_t marker_lifetime_{0.05};
 };  // Visualizer

@@ -700,6 +700,9 @@ void EudmManager::ConstructBehavior(common::SemanticBehavior* behavior) {
                           last_snapshot_.forward_lon_behaviors[selected_seq_id].front();
   behavior->forward_trajs = vec_E<vec_E<common::Vehicle>>{
                                                         last_snapshot_.forward_trajs[selected_seq_id]};
+  behavior->forward_trajs2 = vec_E<vec_E<common::Vehicle>>{
+                                                        last_snapshot_.forward_trajs};
+
   behavior->forward_behaviors = std::vector<LateralBehavior>{
                                                         last_snapshot_.forward_lat_behaviors[selected_seq_id].front()};
   behavior->forward_behaviors2 = std::vector<LateralBehavior>{

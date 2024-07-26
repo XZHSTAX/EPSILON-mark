@@ -80,6 +80,9 @@ add_message_files(
   ArenaInfoStatic.msg
   BehaviorIntArray.msg
   BehaviorString.msg
+  ForwardTrajPoint.msg
+  ForwardTraj.msg
+  ForwardTrajsRecord.msg
 )
 
 generate_messages(

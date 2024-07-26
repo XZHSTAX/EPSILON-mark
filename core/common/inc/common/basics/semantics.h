@@ -223,9 +223,10 @@ struct SemanticBehavior {
   Lane ref_lane;
   decimal_t actual_desired_velocity{0.0};
 
-  vec_E<vec_E<Vehicle>> forward_trajs;
-  std::vector<LateralBehavior> forward_behaviors;
-  std::vector<LateralBehavior> forward_behaviors2;
+  vec_E<vec_E<Vehicle>> forward_trajs;  // 被选中的轨迹
+  vec_E<vec_E<Vehicle>> forward_trajs2; // 所有轨迹
+  std::vector<LateralBehavior> forward_behaviors;  // 被选中的行为序列的第一个行为
+  std::vector<LateralBehavior> forward_behaviors2; // 被选中的行为序列
   // ATTENTION: 如果以后要添加新的行为记录，写新的变量
   vec_E<std::unordered_map<int, vec_E<Vehicle>>> surround_trajs;
 
