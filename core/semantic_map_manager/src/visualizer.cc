@@ -376,13 +376,10 @@ void Visualizer::RecordVisualizeBehavior(const ros::Time &stamp,
   record_behavior_vis_pub_.publish(msg);
 }
 
-void Visualizer::RecordVisualizeForwardTrajectories(const ros::Time& stamp,const common::SemanticBehavior &behavior) {
-  auto forward_trajs = behavior.forward_trajs2;
-  vehicle_msgs::ForwardTrajsRecord msg;
+void Visualizer::GetTrajMsgFromOri(const ros::Time& stamp,vec_E<vec_E<common::Vehicle>> trajs,vehicle_msgs::ForwardTrajsRecord &msg){
   msg.header.stamp = stamp;
-
   // 遍历behavior.forward_trajs中的每个轨迹
-  for (const auto& forward_traj : forward_trajs) {
+  for (const auto& forward_traj : trajs) {
     vehicle_msgs::ForwardTraj traj_msg;
     // 遍历轨迹上的每个点
     for (const auto& v : forward_traj) {
@@ -393,7 +390,32 @@ void Visualizer::RecordVisualizeForwardTrajectories(const ros::Time& stamp,const
       traj_msg.forward_trajs.push_back(point_msg);
     }
     msg.forward_trajs_record.push_back(traj_msg);
-  }
+  }  
+}
+
+void Visualizer::RecordVisualizeForwardTrajectories(const ros::Time& stamp,const common::SemanticBehavior &behavior) {
+  auto forward_trajs1 = behavior.forward_trajs; // 被选中的轨迹
+  auto forward_trajs2 = behavior.forward_trajs2;// 所有轨迹
+  
+  vehicle_msgs::ForwardTrajsRecord msg;
+  GetTrajMsgFromOri(stamp,forward_trajs1,msg);
+  GetTrajMsgFromOri(stamp,forward_trajs2,msg);
+  // vehicle_msgs::ForwardTrajsRecord msg;
+  // msg.header.stamp = stamp;
+
+  // // 遍历behavior.forward_trajs中的每个轨迹
+  // for (const auto& forward_traj : forward_trajs) {
+  //   vehicle_msgs::ForwardTraj traj_msg;
+  //   // 遍历轨迹上的每个点
+  //   for (const auto& v : forward_traj) {
+  //     // 将每个点的位置信息存储到msg中
+  //     vehicle_msgs::ForwardTrajPoint point_msg;
+  //     point_msg.x = v.state().vec_position(0);
+  //     point_msg.y = v.state().vec_position(1);
+  //     traj_msg.forward_trajs.push_back(point_msg);
+  //   }
+  //   msg.forward_trajs_record.push_back(traj_msg);
+  // }
   record_forward_traj_vis_pub_.publish(msg);
 
 }

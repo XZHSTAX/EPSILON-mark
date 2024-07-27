@@ -57,6 +57,9 @@ class Visualizer {
                          const common::SemanticBehavior &behavior);
   void RecordEgoVehicle(const ros::Time &stamp,
                          const common::Vehicle &ego_vehicle);
+  void GetTrajMsgFromOri(const ros::Time& stamp,
+                         vec_E<vec_E<common::Vehicle>> trajs, 
+                         vehicle_msgs::ForwardTrajsRecord &msg);
   void VisualizeSurroundingVehicles(const ros::Time &stamp,
                                     const common::VehicleSet &vehicle_set,
                                     const std::vector<int> &nearby_ids);
