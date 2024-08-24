@@ -3,6 +3,9 @@
     <arg name="playground" default = "carla_map4" />
     <arg name="lane_net_path" default="/home/xzh/ros1/BPws/src/EPSILON/core/hdmap/maps/Town04.txt" />
 
+    <!-- <arg name="playground" default = "case2" />
+    <arg name="lane_net_path" default="/home/xzh/ros1/BPws/src/EPSILON/core/hdmap/maps/Town06.txt" /> -->
+
     <!-- 只利用playground中的agent_config_path -->
     <include file="$(find planning_integrated)/launch/eudm_carla_map.launch">
         <arg name="playground" value="$(arg playground)" />

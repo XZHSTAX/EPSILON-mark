@@ -1,0 +1,20 @@
+{
+  "agent_config": {
+    "_COMMENT": "[AgentConfig] - START",
+    "num": 1,
+    "info": [
+      {
+        "id": 0,
+        "type": "car",
+        "obstacle_map_meta_info": {
+          "width": 1000,
+          "height": 1000,
+          "resolution": 0.2
+        },
+        "surrounding_search_radius": 150.0,
+        "enable_openloop_prediction": true
+      }
+    ],
+    "__COMMENT": "[AgentConfig] - END"
+  }
+}
