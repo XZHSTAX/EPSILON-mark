@@ -83,6 +83,7 @@ add_message_files(
   ForwardTrajPoint.msg
   ForwardTraj.msg
   ForwardTrajsRecord.msg
+  StateSet.msg
 )
 
 generate_messages(

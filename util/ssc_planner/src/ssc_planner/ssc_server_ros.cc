@@ -112,10 +112,24 @@ void SscPlannerServer::PublishData() {
           &traj_mk_arr);
       last_trajmk_cnt_ = num_traj_mks;
       executing_traj_vis_pub_.publish(traj_mk_arr);
+      vehicle_msgs::StateSet state_set;
+      if (executing_traj_->IsValid()) {
+        for (decimal_t s = executing_traj_->begin(); s < executing_traj_->end(); s += 0.1) {
+          common::State state;
+          if (executing_traj_->GetState(s, &state) == kSuccess) {
+
+            vehicle_msgs::State ros_state;
+            vehicle_msgs::Encoder::GetRosStateMsgFromState(state, ros::Time(current_time),&ros_state);
+            state_set.StateSet.push_back(ros_state);
+          }
+        }        
+      }
+
+
+      executing_traj_pub.publish(state_set);
     }
   }
 }
-
 ErrorType SscPlannerServer::FilterSingularityState(
     const vec_E<common::State>& hist, common::State* filter_state) {
   if (hist.empty()) {
@@ -153,6 +167,8 @@ void SscPlannerServer::Init(const std::string& config_path) {
       nh_.advertise<visualization_msgs::MarkerArray>("ssc_map", 1);
   executing_traj_vis_pub_ =
       nh_.advertise<visualization_msgs::MarkerArray>(traj_topic, 1);
+  executing_traj_pub = 
+      nh_.advertise<vehicle_msgs::StateSet>("/record/ssc/exec_traj", 1);
 }
 
 void SscPlannerServer::Start() {

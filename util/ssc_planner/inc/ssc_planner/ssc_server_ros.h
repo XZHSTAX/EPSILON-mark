@@ -33,6 +33,7 @@
 #include "vehicle_msgs/encoder.h"
 #include "visualization_msgs/Marker.h"
 #include "visualization_msgs/MarkerArray.h"
+#include "vehicle_msgs/StateSet.h"
 
 namespace planning {
 class SscPlannerServer {
@@ -88,6 +89,7 @@ class SscPlannerServer {
   ros::Publisher ctrl_signal_pub_;
   ros::Publisher map_marker_pub_;
   ros::Publisher executing_traj_vis_pub_;
+  ros::Publisher executing_traj_pub;
 
   // input buffer
   moodycamel::ReaderWriterQueue<SemanticMapManager> *p_input_smm_buff_;

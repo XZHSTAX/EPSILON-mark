@@ -7,10 +7,12 @@ namespace planning {
 void EudmManager::Init(const std::string& config_path,
                        const decimal_t work_rate) {
   google::InitGoogleLogging("eudm");
-  google::SetLogDestination(google::GLOG_INFO, "~/.eudm_log/");
-  google::SetLogDestination(google::GLOG_WARNING, "~/.eudm_log/");
-  google::SetLogDestination(google::GLOG_ERROR, "~/.eudm_log/");
-  google::SetLogDestination(google::GLOG_FATAL, "~/.eudm_log/");
+  // google::SetLogDestination(google::GLOG_INFO, "~/.eudm_log/");
+  // google::SetLogDestination(google::GLOG_WARNING, "~/.eudm_log/");
+  // google::SetLogDestination(google::GLOG_ERROR, "~/.eudm_log/");
+  // google::SetLogDestination(google::GLOG_FATAL, "~/.eudm_log/");
+  FLAGS_log_dir = "/home/xzh/ros1/BPws/tmp";
+  FLAGS_colorlogtostderr = 1;
 
   bp_.Init(config_path);
   bp_.set_map_interface(&map_adapter_);

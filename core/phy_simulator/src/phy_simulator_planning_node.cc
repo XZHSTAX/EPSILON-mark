@@ -126,7 +126,7 @@ int main(int argc, char** argv) {
     if (tnow >= next_gt_pub_time) {
       next_gt_pub_time += ros::Duration(1.0 / gt_msg_rate);
       // ATTENTION 发布所有车辆的状态
-      ros_adapter.PublishDynamicDataWithStamp(tnow);
+      // ros_adapter.PublishDynamicDataWithStamp(tnow);
     }
     // 静态信号，除了timestmp，都是固定的；10Hz
     if (tnow >= next_gt_static_pub_time) {
