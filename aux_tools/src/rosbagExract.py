@@ -10,6 +10,8 @@ topic_name2 = "/record/agent_0/ego_vehicle_status"
 topic_name3 = "/record/agent_0/forward_trajs"
 topic_name4 = "/vis/agent_0/local_lanes_vis"
 
+topic_name6 = "/record/ssc/exec_traj"
+
 # 记录每个时间步的behavior
 behavior_record = []
 behavior_record_time = []
@@ -54,6 +56,24 @@ for topic, msg, t in perception_data:
                 Local_lane.append([point.x, point.y])
             Local_lanes_record_current.append(Local_lane)
         Local_lanes_record.append(Local_lanes_record_current)
-        
+
+
+ssc_traj = []
+perception_data = bag_data.read_messages(topic_name6)
+for topic, msg, t in perception_data:
+    current_time_ssc_trajs = [] # 0 x,1 y,2 angle,3 velocity,4 acceleration,5 curvature,6 steer
+    if msg is not None:
+        for state in msg.StateSet:
+            current_time_ssc_trajs.append([state.vec_position.x,state.vec_position.y,state.angle,state.velocity,state.acceleration,state.curvature,state.steer])
+        ssc_traj.append(current_time_ssc_trajs)
+            
+
+PP_ctrl_signal = []
+perception_data = bag_data.read_messages("/PP_ctrl_signal")
+for topic, msg, t in perception_data:
+    if msg is not None:
+        PP_ctrl_signal.append([msg.vec_position.x,msg.vec_position.y,msg.velocity,msg.steer])
+
+
 bag_data.close()
 

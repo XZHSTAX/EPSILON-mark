@@ -88,6 +88,7 @@ int main(int argc, char** argv) {
   int num_vehicles = static_cast<int>(vehicle_ids.size());
   _ros_sub.resize(num_vehicles);
 
+  // 订阅车辆控制信号
   for (int i = 0; i < num_vehicles; i++) {
     auto vehicle_id = vehicle_ids[i];
     std::string topic_name =

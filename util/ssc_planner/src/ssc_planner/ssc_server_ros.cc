@@ -33,7 +33,7 @@ void SscPlannerServer::PushSemanticMap(const SemanticMapManager& smm) {
 }
 
 /**
- * 向phy_simulator_planning_node发送控制信号，topic方式，topic name为 control，被映射为/ctrl/agent_0
+ * 向phy_simulator_planning_node发送控制信号，topic方式，topic name为 ctrl，被映射为/ctrl/agent_0
 */
 void SscPlannerServer::PublishData() {
   using common::VisualizationUtil;

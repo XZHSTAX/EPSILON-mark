@@ -86,7 +86,7 @@ class SscPlannerServer {
   int ego_id_;
 
   bool require_intervention_signal_ = false;
-  ros::Publisher ctrl_signal_pub_;
+  ros::Publisher ctrl_signal_pub_; // 用来发布名为ctrl的topic，消息类型为vehicle_msgs::ControlSignal
   ros::Publisher map_marker_pub_;
   ros::Publisher executing_traj_vis_pub_;
   ros::Publisher executing_traj_pub;

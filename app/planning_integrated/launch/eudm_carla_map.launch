@@ -18,7 +18,8 @@
     <param name="agent_config_path" type="string" value="$(find playgrounds)/$(arg playground)/agent_config.json" />
     <param name="bp_config_path" type="string" value="$(find eudm_planner)/config/eudm_config.pb.txt" />
     <param name="ssc_config_path" type="string" value="$(find ssc_planner)/config/ssc_config.pb.txt" />
-    <param name="desired_vel" value="20.0"/>
+    <param name="desired_vel" value="10.0"/>
+    <!-- 这玩意也有问题 -->
     <param name="use_sim_state" value="true"/>
     <remap from="~arena_info_static" to="$(arg arena_info_static_topic)"/>
     <remap from="~arena_info_dynamic" to="$(arg arena_info_dynamic_topic)"/>
