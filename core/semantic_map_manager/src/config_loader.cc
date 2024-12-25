@@ -15,7 +15,7 @@ ErrorType ConfigLoader::ParseAgentConfig(AgentConfigInfo *p_agent_config) {
   int num = static_cast<int>(agent_config_json["info"].size());
   for (int i = 0; i < num; ++i) {
     Json agent = agent_config_json["info"][i];
-    if (agent["id"].get<int>() != ego_id_) continue;
+    if (agent["id"].get<int>() != ego_id_) continue;  // 如果不是主车，则跳过
     // 得到主车的配置参数
     p_agent_config->obstacle_map_meta_info = common::GridMapMetaInfo(
         agent["obstacle_map_meta_info"]["width"].get<double>(),

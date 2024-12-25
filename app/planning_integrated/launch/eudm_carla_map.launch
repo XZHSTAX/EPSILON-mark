@@ -5,6 +5,7 @@
   <arg name="ctrl_topic" value="/ctrl/agent_0" />
 
   <arg name="playground" default = "carla_map1" />
+  <arg name="use_sim_state" default = "true" />
   <!-- <arg name="playground" value = "ring_tiny_v1.0" /> -->
   <!-- <arg name="playground" value = "ring_small_v1.0" /> -->
 
@@ -20,7 +21,7 @@
     <param name="ssc_config_path" type="string" value="$(find ssc_planner)/config/ssc_config.pb.txt" />
     <param name="desired_vel" value="10.0"/>
     <!-- 这玩意也有问题 -->
-    <param name="use_sim_state" value="true"/>
+    <param name="use_sim_state" value="$(arg use_sim_state)"/>
     <remap from="~arena_info_static" to="$(arg arena_info_static_topic)"/>
     <remap from="~arena_info_dynamic" to="$(arg arena_info_dynamic_topic)"/>
     <remap from="~ctrl" to="$(arg ctrl_topic)"/>

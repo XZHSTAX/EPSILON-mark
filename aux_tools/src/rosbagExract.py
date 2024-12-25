@@ -1,5 +1,9 @@
 import rosbag
-bag_file = '/home/xzh/ros1/BPws/my_bag.bag'
+from rich.console import Console
+from rich.table import Table
+
+
+bag_file = '/home/xzh/ros1/BPws/my_bag_debug1.bag'
 bag_data = rosbag.Bag(bag_file, "r")
 
 info = bag_data.get_type_and_topic_info()
@@ -77,3 +81,26 @@ for topic, msg, t in perception_data:
 
 bag_data.close()
 
+
+# 创建一个控制台对象
+console = Console()
+
+# 创建一个表格对象
+table = Table(title="conclusion 1")
+
+# 添加列名
+# style: 设置该列的样式 no_wrap: 设置该列内容不换行 justify: 设置该列内容对齐方式
+table.add_column("list name", style="cyan", no_wrap=True)
+table.add_column("len", justify="right")
+
+# 添加行数据
+table.add_row("behavior_record", str(len(behavior_record)))
+table.add_row("ego_vehicle_position", str(len(ego_vehicle_position)))
+table.add_row("forward_trajs_record", str(len(forward_trajs_record)))
+
+table.add_row("Local_lanes_record", str(len(Local_lanes_record)))
+table.add_row("ssc_traj", str(len(ssc_traj)))
+table.add_row("PP_ctrl_signal", str(len(PP_ctrl_signal)))
+
+
+console.print(table)

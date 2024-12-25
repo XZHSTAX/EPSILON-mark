@@ -1,5 +1,6 @@
 <launch>
     <!-- 使用carla作为车辆的状态返回，双机通讯版本11.30,debug版本，会收集更多的topic  -->
+    <!-- 相对于1，删除了online agent，调整了rosbag的数据收集 -->
     <!-- 设置车辆信息位置从何处读取 -->
     <arg name="playground" default = "carla_map4" />
     <arg name="lane_net_path" default="/home/xzh/ros1/BPws/src/EPSILON/core/hdmap/maps/Town04.txt" />
@@ -14,11 +15,6 @@
         <arg name="playground" value="$(arg playground)" />
         <arg name="use_sim_state" value="$(arg use_sim_state)" />
     </include>
-    
-    <!-- 只利用playground中的agent_config_path -->
-    <include file="$(find ai_agent_planner)/launch/onlane_ai_agent_xodr.launch">
-        <arg name="playground" value="$(arg playground)" />
-    </include>
 
     <!-- playground中的map_path和vehicle_info_path -->
     <!-- 实际上还会利用lane_net_path，但是我修改了lane_net_path的路径 -->
@@ -32,12 +28,11 @@
     
     <node pkg="rosbag" type="record" name="rosbag_record" 
           args="-O /home/xzh/ros1/BPws/my_bag_debug1.bag 
-                   /record/agent_0/ego_vehicle_status 
                    /record/agent_0/ego_behavior_vis 
                    /record/agent_0/forward_trajs 
                    /vis/agent_0/local_lanes_vis
-                   /record/agent_1/ego_vehicle_status
                    /record/ssc/exec_traj
-                   /PP_ctrl_signal" 
+                   /PP_ctrl_signal
+                   /arena_info_dynamic" 
           output="screen"/> 
 </launch>
